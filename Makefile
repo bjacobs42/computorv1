@@ -1,7 +1,7 @@
 NAME	:= computorv
 SRC_FR	:= ./src/
 OBJ_FR	:= obj/
-INCLUDE	:= -I ./include
+INCLUDE	:= -I ./include -I ./include/parsing -I ./include/utils/
 CC		:= c++
 
 ifdef DEBUG
@@ -10,18 +10,17 @@ else
 CFLAGS	:= -Wall -Werror -Wextra
 endif
 
-SRC_FILES	:= main.cpp
+SRC_FILES	:= main.cpp \
+			   token.cpp \
+			   utils/lexer.cpp
 OBJS		:= $(addprefix $(OBJ_FR), $(SRC_FILES:.cpp=.o))
 
 all: ${NAME}
 
-$(OBJ_FR)%.o : ${SRC_FR}%.cpp | $(OBJ_FR)
+$(OBJ_FR)%.o : ${SRC_FR}%.cpp
+	@mkdir -p $(dir $@)
 	@echo "$(PURPLE)Compiling... $(NC)🧱 $(PURPLE) $< $(NC)"
 	@${CC} ${CFLAGS} $(INCLUDE) -c $^ -o $@
-
-$(OBJ_FR):
-	@echo "$(YELLOW)Creating folders... $(NC)🗂"
-	@mkdir -p $(OBJ_FR)
 
 $(NAME): ${OBJS}
 	@echo "$(BLD_GRN)Building... 🏗$(NC)"
