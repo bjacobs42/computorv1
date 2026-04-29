@@ -4,4 +4,4 @@
 #include <string>
 #include <vector>
 
-std::vector<token> lexer(const std::string& input);
+std::vector<token> lexer(const std::string &input);
