@@ -21,4 +21,7 @@ private:
 
   inline bool _has_tokens(void) const;
   inline TokenType _peek_type(void) const;
+
+  ast::Expr _nud_handler(void);
+  ast::Expr _led_handler(void);
 };

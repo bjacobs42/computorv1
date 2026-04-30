@@ -15,7 +15,7 @@ enum class CharClass
 class Lexer
 {
 public:
-  Lexer(const std::string &input);
+  explicit Lexer(const std::string &input);
   ~Lexer(void);
 
   std::vector<Token> lex(void);
