@@ -1,8 +1,8 @@
-NAME	:= computorv
+NAME		:= computorv
 SRC_FR	:= ./src/
 OBJ_FR	:= obj/
 INCLUDE	:= -I ./include
-CC		:= c++
+CC			:= c++
 
 ifdef DEBUG
 CFLAGS	:= -g -fsanitize=address
@@ -11,8 +11,10 @@ CFLAGS	:= -Wall -Werror -Wextra
 endif
 
 SRC_FILES	:= main.cpp \
-			   token.cpp \
-			   utils/lexer.cpp
+						 lexer/Token.cpp \
+						 lexer/Lexer.cpp \
+						 parser/Parser.cpp \
+
 OBJS		:= $(addprefix $(OBJ_FR), $(SRC_FILES:.cpp=.o))
 
 all: ${NAME}

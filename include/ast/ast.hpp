@@ -1,48 +1,48 @@
 #pragma once
 
-#include "lexer/token.hpp"
+#include "lexer/Token.hpp"
 
 namespace ast
 {
-  enum class expr_kind
+  enum class ExprKind
   {
     number,
     variable,
     binary
   };
 
-  struct expr
+  struct Expr
   {
-    expr_kind kind;
-    virtual ~expr(void) = default;
+    ExprKind kind;
+    virtual ~Expr(void) = default;
   };
 
-  struct number_expr : expr
+  struct NumberExpr : Expr
   {
-    number_expr(void) { kind = expr_kind::number; };
-    number_expr(float init_value)
+    NumberExpr(void) { kind = ExprKind::number; };
+    NumberExpr(float init_value)
     {
       value = init_value;
-      kind = expr_kind::number;
+      kind = ExprKind::number;
     };
     float value;
   };
 
-  struct variable_expr : expr
+  struct VariableExpr : Expr
   {
-    variable_expr(void) { kind = expr_kind::variable; };
-    variable_expr(char variable_name)
+    VariableExpr(void) { kind = ExprKind::variable; };
+    VariableExpr(char variable_name)
     {
       name = variable_name;
-      kind = expr_kind::variable;
+      kind = ExprKind::variable;
     };
     char name;
   };
 
-  struct binary_expr
+  struct BinaryExpr
   {
-    expr left;
-    token op;
-    expr right;
+    Expr left;
+    Token op;
+    Expr right;
   };
 } // namespace ast
