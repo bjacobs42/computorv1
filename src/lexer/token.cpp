@@ -1,4 +1,5 @@
-#include "token.hpp"
+#include "lexer/token.hpp"
+#include <cctype>
 #include <string>
 
 token::~token(void) {}
@@ -15,10 +16,5 @@ token::token(const std::string &value, int pos, token_type type)
   _type = type;
   _value = value;
 }
-
-static token_type get_token_type(char character)
-{
-  return token_type::END;
-} // to be implemented
 
 token_type token::get_token_type(void) const { return _type; };

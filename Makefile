@@ -1,7 +1,7 @@
 NAME	:= computorv
 SRC_FR	:= ./src/
 OBJ_FR	:= obj/
-INCLUDE	:= -I ./include -I ./include/parsing -I ./include/utils/
+INCLUDE	:= -I ./include
 CC		:= c++
 
 ifdef DEBUG

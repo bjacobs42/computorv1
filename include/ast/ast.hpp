@@ -1,6 +1,6 @@
 #pragma once
 
-#include "token.hpp"
+#include "lexer/token.hpp"
 
 namespace ast
 {
@@ -19,13 +19,23 @@ namespace ast
 
   struct number_expr : expr
   {
-    number_expr() { kind = expr_kind::number; };
+    number_expr(void) { kind = expr_kind::number; };
+    number_expr(float init_value)
+    {
+      value = init_value;
+      kind = expr_kind::number;
+    };
     float value;
   };
 
   struct variable_expr : expr
   {
-    variable_expr() { kind = expr_kind::variable; };
+    variable_expr(void) { kind = expr_kind::variable; };
+    variable_expr(char variable_name)
+    {
+      name = variable_name;
+      kind = expr_kind::variable;
+    };
     char name;
   };
 
