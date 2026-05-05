@@ -24,7 +24,7 @@ public:
 
 private:
   using NudFn = ast::Expr (Parser::*)(void);
-  using LedFn = ast::Expr (Parser::*)(ast::Expr);
+  using LedFn = ast::Expr (Parser::*)(ast::Expr, BindingPower);
 
   struct Entry
   {
