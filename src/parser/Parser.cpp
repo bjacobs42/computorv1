@@ -2,35 +2,36 @@
 #include "ast/ast.hpp"
 #include "lexer/Lexer.hpp"
 #include "lexer/Token.hpp"
+#include <string>
 
 Parser::Parser(const std::string &input)
 {
   Lexer lexer(input);
+
   _tokens = lexer.lex();
   _pos = 0;
 }
 
 Parser::~Parser() {}
 
-inline Token Parser::_peek(void) const
+ast::Expr Parser::parse(void)
 {
-  return (_tokens[_pos]);
+  // first needs to be a nud.
+  while (_has_tokens())
+  {
+    // while bp <= left's bp? keep binding?
+  }
+
+  return (ast::Expr());
 }
+
+inline Token Parser::_peek(void) const { return (_tokens[_pos]); }
 
 Token Parser::_consume(void)
 {
   Token token = _tokens[_pos];
   ++_pos;
   return (token);
-}
-
-ast::Expr Parser::parse(void)
-{
-  while (_has_tokens())
-  {
-  }
-
-  return (ast::Expr());
 }
 
 inline TokenType Parser::_peek_type(void) const
@@ -40,7 +41,112 @@ inline TokenType Parser::_peek_type(void) const
 
 inline bool Parser::_has_tokens(void) const
 {
-  return (
-      _peek_type() != TokenType::END || _pos < _tokens.size()
+  return (_peek_type() != TokenType::END || _pos < _tokens.size());
+}
+
+ast::Expr Parser::_parse_expression(BindingPower bp)
+{
+  NudFn nud_fn = _lookup[(int)_peek().get_token_type()].nud;
+  if (!nud_fn)
+    throw; // implement error handler
+
+  ast::Expr left = _parse_number_expression();
+  BindingPower current_bp = _lookup[(int)_peek().get_token_type()].bp;
+  while (bp < current_bp)
+  {
+    NudFn nud_fn = _lookup[(int)_peek().get_token_type()].nud;
+    if (!nud_fn)
+      throw; // implement error handler
+
+    left = _parse_binary_expression(left, current_bp);
+    current_bp = _lookup[(int)_peek().get_token_type()].bp;
+  }
+
+  return (left);
+}
+
+ast::Expr Parser::_parse_number_expression(void)
+{
+  Token token = _consume();
+
+  switch (token.get_token_type())
+  {
+  case TokenType::NUMBER:
+  {
+    float num = std::stof(token.get_value());
+    return (ast::NumberExpr(num));
+  }
+  case TokenType::VARIABLE:
+    return (ast::VariableExpr(token.get_value()[0]));
+  default:
+    throw; // implement error handler!
+  }
+}
+
+ast::Expr Parser::_parse_binary_expression(ast::Expr left, BindingPower bp)
+{
+  Token operatorToken = _consume();
+  ast::Expr right = _parse_expression(bp);
+
+  return (ast::BinaryExpr(&left, &operatorToken, &right));
+}
+
+void Parser::_register_nud(
+    TokenType token_type, BindingPower bp, NudFn nud
+)
+{
+  Entry *entry = &_lookup[(int)token_type];
+
+  entry->bp = bp;
+  entry->nud = nud;
+}
+
+void Parser::_register_led(
+    TokenType token_type, BindingPower bp, LedFn led
+)
+{
+  Entry *entry = &_lookup[(int)token_type];
+
+  entry->bp = bp;
+  entry->led = led;
+}
+
+void Parser::_init_lookup(void)
+{
+  _register_nud(
+      TokenType::NUMBER,
+      BindingPower::number,
+      &Parser::_parse_number_expression
+  );
+  _register_nud(
+      TokenType::VARIABLE,
+      BindingPower::number,
+      &Parser::_parse_number_expression
+  );
+
+  _register_led(
+      TokenType::DASH,
+      BindingPower::additive,
+      &Parser::_parse_binary_expression
+  );
+  _register_led(
+      TokenType::DASH,
+      BindingPower::additive,
+      &Parser::_parse_binary_expression
+  );
+  _register_led(
+      TokenType::STAR,
+      BindingPower::multiplicative,
+      &Parser::_parse_binary_expression
+  );
+  _register_led(
+      TokenType::SLASH,
+      BindingPower::multiplicative,
+      &Parser::_parse_binary_expression
+  );
+  _register_led(
+      TokenType::CARET,
+      BindingPower::exponential,
+      &Parser::_parse_binary_expression
   );
 }

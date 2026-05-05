@@ -39,10 +39,19 @@ namespace ast
     char name;
   };
 
-  struct BinaryExpr
+  struct BinaryExpr : Expr
   {
-    Expr left;
-    Token op;
-    Expr right;
+    BinaryExpr(void) { kind = ExprKind::binary; };
+    BinaryExpr(Expr *new_left, Token *new_op, Expr *new_right)
+    {
+      kind = ExprKind::binary;
+      left = new_left;
+      op = new_op;
+      right = new_right;
+    };
+
+    Expr *left;
+    Token *op;
+    Expr *right;
   };
 } // namespace ast

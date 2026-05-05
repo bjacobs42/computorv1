@@ -12,8 +12,7 @@ namespace ft_math
     return (base * base);
   }
 
-  template <typename Type = double>
-  constexpr Type power(Type base, unsigned int exponent)
+  template <typename Type = double> constexpr Type power(Type base, unsigned int exponent)
   {
     Type result = (Type)1;
 
@@ -27,6 +26,5 @@ namespace ft_math
     return (result);
   }
 
-  template <typename Type = double>
-  Type sqrt(const Type &base, const int &expression);
+  template <typename Type = double> Type sqrt(const Type &base, const int &expression);
 } // namespace ft_math

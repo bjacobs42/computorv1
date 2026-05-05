@@ -3,13 +3,20 @@
 
 Token Lexer::_handle_number(void)
 {
-  size_t end = _pos;
+  size_t start = _pos;
+  bool has_dot = false;
 
-  while (_input[end] && std::isdigit(_input[end]))
-    ++end;
-  return (
-      Token(_input.substr(_pos, end), _pos, TokenType::NUMBER)
-  );
+  while (_input[_pos])
+  {
+    char character = _input[_pos];
+
+    if (character == '.' && !has_dot)
+      has_dot = true;
+    else if (!std::isdigit(character))
+      break;
+    ++_pos;
+  }
+  return (Token(_input.substr(start, _pos - start), _pos, TokenType::NUMBER));
 }
 
 Token Lexer::_handle_variable(void)
@@ -17,9 +24,7 @@ Token Lexer::_handle_variable(void)
   size_t index = _pos;
   char character = _input[_pos++];
 
-  return (Token(
-      std::string(1, character), index, TokenType::VARIABLE
-  ));
+  return (Token(std::string(1, character), index, TokenType::VARIABLE));
 }
 
 Token Lexer::_handle_operator(void)
@@ -27,11 +32,7 @@ Token Lexer::_handle_operator(void)
   size_t index = _pos;
   char character = _input[_pos++];
 
-  return (Token(
-      std::string(1, character),
-      index,
-      Token::get_token_type(character)
-  ));
+  return (Token(std::string(1, character), index, Token::get_token_type(character)));
 }
 Token Lexer::_handle_error(void) { throw std::exception(); }
 
