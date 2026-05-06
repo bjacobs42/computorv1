@@ -16,13 +16,10 @@ Parser::~Parser() {}
 
 ast::Expr Parser::parse(void)
 {
-  // first needs to be a nud.
-  while (_has_tokens())
-  {
-    // while bp <= left's bp? keep binding?
-  }
+  ast::Expr expression;
 
-  return (ast::Expr());
+  expression = _parse_expression(BindingPower::default_bp);
+  return (expression);
 }
 
 inline Token Parser::_peek(void) const { return (_tokens[_pos]); }
@@ -50,18 +47,17 @@ ast::Expr Parser::_parse_expression(BindingPower bp)
   if (!nud_fn)
     throw; // implement error handler
 
-  ast::Expr left = _parse_number_expression();
+  ast::Expr left = (this->*nud_fn)();
   BindingPower current_bp = _lookup[(int)_peek().get_type()].bp;
-  while (bp < current_bp)
+  while (bp < current_bp && _has_tokens())
   {
-    NudFn nud_fn = _lookup[(int)_peek().get_type()].nud;
-    if (!nud_fn)
+    LedFn led_fn = _lookup[(int)_peek().get_type()].led;
+    if (!led_fn)
       throw; // implement error handler
 
-    left = _parse_binary_expression(left, current_bp);
+    left = (this->*led_fn)(left, current_bp);
     current_bp = _lookup[(int)_peek().get_type()].bp;
   }
-
   return (left);
 }
 

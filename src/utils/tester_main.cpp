@@ -1,3 +1,4 @@
+#include "ast/ast.hpp"
 #include "config.hpp"
 #include "lexer/Lexer.hpp"
 #include <iostream>
@@ -22,6 +23,14 @@ void print_tokens(const std::vector<Token> &tokens)
     outstream << token_types[(int)token.get_type()] << " "
               << token.get_value() << std::endl;
   std::cout << outstream.str();
+}
+
+void print_ast(const ast::Expr &expression)
+{
+  if (expression.kind != ast::ExprKind::binary)
+  {
+    return;
+  }
 }
 
 int main(int ac, char **argv)
