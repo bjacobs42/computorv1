@@ -1,5 +1,20 @@
 #include "lexer/Lexer.hpp"
 #include "lexer/Token.hpp"
+#include <cctype>
+
+Lexer::Lexer(const std::string &input) : _input(input) {}
+Lexer::~Lexer(void) {}
+
+CharClass Lexer::_classify(char character)
+{
+  if (std::isdigit(character))
+    return (CharClass::digit);
+  if (std::isalpha(character))
+    return (CharClass::alpha);
+  if (std::isprint(character))
+    return (CharClass::oper);
+  return (CharClass::unknown);
+}
 
 Token Lexer::_handle_number(void)
 {
@@ -16,7 +31,9 @@ Token Lexer::_handle_number(void)
       break;
     ++_pos;
   }
-  return (Token(_input.substr(start, _pos - start), _pos, TokenType::NUMBER));
+  return (
+      Token(_input.substr(start, _pos - start), _pos, TokenType::NUMBER)
+  );
 }
 
 Token Lexer::_handle_variable(void)
@@ -32,7 +49,9 @@ Token Lexer::_handle_operator(void)
   size_t index = _pos;
   char character = _input[_pos++];
 
-  return (Token(std::string(1, character), index, Token::get_token_type(character)));
+  return (Token(
+      std::string(1, character), index, Token::get_token_type(character)
+  ));
 }
 Token Lexer::_handle_error(void) { throw std::exception(); }
 
