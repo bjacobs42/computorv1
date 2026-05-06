@@ -36,7 +36,7 @@ Token Parser::_consume(void)
 
 inline TokenType Parser::_peek_type(void) const
 {
-  return (_peek().get_token_type());
+  return (_peek().get_type());
 }
 
 inline bool Parser::_has_tokens(void) const
@@ -46,20 +46,20 @@ inline bool Parser::_has_tokens(void) const
 
 ast::Expr Parser::_parse_expression(BindingPower bp)
 {
-  NudFn nud_fn = _lookup[(int)_peek().get_token_type()].nud;
+  NudFn nud_fn = _lookup[(int)_peek().get_type()].nud;
   if (!nud_fn)
     throw; // implement error handler
 
   ast::Expr left = _parse_number_expression();
-  BindingPower current_bp = _lookup[(int)_peek().get_token_type()].bp;
+  BindingPower current_bp = _lookup[(int)_peek().get_type()].bp;
   while (bp < current_bp)
   {
-    NudFn nud_fn = _lookup[(int)_peek().get_token_type()].nud;
+    NudFn nud_fn = _lookup[(int)_peek().get_type()].nud;
     if (!nud_fn)
       throw; // implement error handler
 
     left = _parse_binary_expression(left, current_bp);
-    current_bp = _lookup[(int)_peek().get_token_type()].bp;
+    current_bp = _lookup[(int)_peek().get_type()].bp;
   }
 
   return (left);
@@ -69,7 +69,7 @@ ast::Expr Parser::_parse_number_expression(void)
 {
   Token token = _consume();
 
-  switch (token.get_token_type())
+  switch (token.get_type())
   {
   case TokenType::NUMBER:
   {

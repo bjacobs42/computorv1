@@ -19,7 +19,7 @@ void print_tokens(const std::vector<Token> &tokens)
 
   std::stringstream outstream;
   for (const Token &token : tokens)
-    outstream << token_types[(int)token.get_token_type()] << " "
+    outstream << token_types[(int)token.get_type()] << " "
               << token.get_value() << std::endl;
   std::cout << outstream.str();
 }

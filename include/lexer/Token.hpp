@@ -22,8 +22,8 @@ public:
   ~Token(void);
 
   const std::string &get_value(void) const;
-  TokenType get_token_type(void) const;
-  static TokenType get_token_type(char character)
+  TokenType get_type(void) const;
+  static TokenType get_type(char character)
   {
     switch (character)
     {

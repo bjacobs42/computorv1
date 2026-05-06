@@ -10,7 +10,7 @@ else
 CFLAGS	:= -Wall -Werror -Wextra
 endif
 
-SRC_FILES	:= tester_main.cpp \
+SRC_FILES	:= utils/tester_main.cpp \
 						 lexer/Token.cpp \
 						 lexer/Lexer.cpp \
 						 parser/Parser.cpp \

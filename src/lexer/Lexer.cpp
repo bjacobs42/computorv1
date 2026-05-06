@@ -49,9 +49,9 @@ Token Lexer::_handle_operator(void)
   size_t index = _pos;
   char character = _input[_pos++];
 
-  return (Token(
-      std::string(1, character), index, Token::get_token_type(character)
-  ));
+  return (
+      Token(std::string(1, character), index, Token::get_type(character))
+  );
 }
 Token Lexer::_handle_error(void) { throw std::exception(); }
 
@@ -72,6 +72,11 @@ std::vector<Token> Lexer::lex()
 
     CharClass char_class = _classify(character);
     Token tok = (this->*_token_handlers[(int)char_class])();
+    if (tok.get_type() == TokenType::VARIABLE &&
+        tokens.back().get_type() == TokenType::NUMBER)
+    {
+      tokens.push_back(Token(std::string(1, '*'), _pos, TokenType::STAR));
+    }
     tokens.push_back(tok);
   }
   return (tokens);
