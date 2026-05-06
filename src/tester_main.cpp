@@ -8,7 +8,13 @@
 void print_tokens(const std::vector<Token> &tokens)
 {
   static const std::string token_types[] = {
-      "Number:", "Variable:", "Plus", "Minus", "Multiply", "Exponent"
+      "Number:",
+      "Variable:",
+      "Plus:",
+      "Minus:",
+      "Multiply:",
+      "Divide:",
+      "Exponent:"
   };
 
   std::stringstream outstream;
@@ -32,5 +38,6 @@ int main(int ac, char **argv)
     input += argv[i];
 
   std::vector<Token> tokens = Lexer(input).lex();
+  print_tokens(tokens);
   return (0);
 }
