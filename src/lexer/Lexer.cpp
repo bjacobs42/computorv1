@@ -55,15 +55,6 @@ Token Lexer::_handle_operator(void)
 }
 Token Lexer::_handle_error(void) { throw std::exception(); }
 
-inline bool is_implicit_multi(TokenType prev_type, TokenType current_type)
-{
-  return (
-      (prev_type == TokenType::VARIABLE ||
-       prev_type == TokenType::NUMBER) &&
-      current_type == TokenType::VARIABLE
-  );
-}
-
 std::vector<Token> Lexer::lex()
 {
   std::vector<Token> tokens;
@@ -81,11 +72,6 @@ std::vector<Token> Lexer::lex()
 
     CharClass char_class = _classify(character);
     Token tok = (this->*_token_handlers[(int)char_class])();
-    if (tokens.size() &&
-        is_implicit_multi(tokens.back().get_type(), tok.get_type()))
-    {
-      tokens.push_back(Token(std::string(1, '*'), _pos, TokenType::STAR));
-    }
     tokens.push_back(tok);
   }
   return (tokens);

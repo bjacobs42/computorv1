@@ -36,6 +36,13 @@ inline TokenType Parser::_peek_type(void) const
   return (_peek().get_type());
 }
 
+TokenType Parser::_look_ahead(void) const
+{
+  if (_pos + 1 >= _tokens.size())
+    return (TokenType::END);
+  return (_tokens[_pos + 1].get_type());
+}
+
 inline bool Parser::_has_tokens(void) const
 {
   return (_peek_type() != TokenType::END || _pos < _tokens.size());
@@ -43,20 +50,20 @@ inline bool Parser::_has_tokens(void) const
 
 ast::Expr Parser::_parse_expression(BindingPower bp)
 {
-  NudFn nud_fn = _lookup[(int)_peek().get_type()].nud;
+  NudFn nud_fn = _lookup[(int)_peek_type()].nud;
   if (!nud_fn)
     throw; // implement error handler
 
   ast::Expr left = (this->*nud_fn)();
-  BindingPower current_bp = _lookup[(int)_peek().get_type()].bp;
+  BindingPower current_bp = _lookup[(int)_peek_type()].bp;
   while (bp < current_bp && _has_tokens())
   {
-    LedFn led_fn = _lookup[(int)_peek().get_type()].led;
+    LedFn led_fn = _lookup[(int)_peek_type()].led;
     if (!led_fn)
       throw; // implement error handler
 
     left = (this->*led_fn)(left, current_bp);
-    current_bp = _lookup[(int)_peek().get_type()].bp;
+    current_bp = _lookup[(int)_peek_type()].bp;
   }
   return (left);
 }
@@ -82,6 +89,21 @@ ast::Expr Parser::_parse_number_expression(void)
 ast::Expr Parser::_parse_binary_expression(ast::Expr left, BindingPower bp)
 {
   Token operatorToken = _consume();
+  ast::Expr right = _parse_expression(bp);
+
+  return (ast::BinaryExpr(&left, &operatorToken, &right));
+}
+
+ast::Expr
+Parser::_parse_implicit_expression(ast::Expr left, BindingPower bp)
+{
+  if (_peek_type() == TokenType::NUMBER &&
+      _look_ahead() == TokenType::NUMBER)
+  {
+    throw; // Implement error
+  }
+
+  Token operatorToken = Token(std::string(1, '*'), 0);
   ast::Expr right = _parse_expression(bp);
 
   return (ast::BinaryExpr(&left, &operatorToken, &right));
@@ -120,6 +142,16 @@ void Parser::_init_lookup(void)
       &Parser::_parse_number_expression
   );
 
+  _register_led(
+      TokenType::VARIABLE,
+      BindingPower::multiplicative,
+      &Parser::_parse_implicit_expression
+  );
+  _register_led(
+      TokenType::NUMBER,
+      BindingPower::multiplicative,
+      &Parser::_parse_implicit_expression
+  );
   _register_led(
       TokenType::DASH,
       BindingPower::additive,

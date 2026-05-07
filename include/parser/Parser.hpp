@@ -42,11 +42,13 @@ private:
   inline Token _peek(void) const;
   inline TokenType _peek_type(void) const;
   Token _consume(void);
+  TokenType _look_ahead(void) const;
 
   // handlers
   ast::Expr _parse_expression(BindingPower bp);
   ast::Expr _parse_number_expression(void);
   ast::Expr _parse_binary_expression(ast::Expr left, BindingPower bp);
+  ast::Expr _parse_implicit_expression(ast::Expr left, BindingPower bp);
 
   // registration
   void _register_nud(TokenType token_type, BindingPower bp, NudFn nud);
