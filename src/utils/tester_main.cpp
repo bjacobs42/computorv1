@@ -2,6 +2,7 @@
 #include "config.hpp"
 #include "lexer/Lexer.hpp"
 #include "parser/Parser.hpp"
+#include <exception>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -37,7 +38,8 @@ void fill_grid(
     value = ((ast::BinaryExpr *)expression.get())->op.get_value();
     break;
   case (int)ast::ExprKind::number:
-    value = std::to_string(((ast::NumberExpr *)expression.get())->value);
+    value =
+        std::to_string((int)((ast::NumberExpr *)expression.get())->value);
     break;
   case (int)ast::ExprKind::variable:
     value = ((ast::VariableExpr *)expression.get())->name;
@@ -126,10 +128,18 @@ int main(int ac, char **argv)
   Parser parser(input);
   print_tokens(tokens);
 
-  std::cout << "parsing..." << std::endl;
-  ast::ExprPtr ast = parser.parse();
+  ast::ExprPtr ast;
+  try
+  {
+    std::cout << "parsing..." << std::endl;
+    ast = parser.parse();
+  }
+  catch (std::exception &e)
+  {
+    return (1);
+  }
 
-  std::cout << "printing..." << std::endl;
+  std::cout << "Result:" << std::endl;
   print_ast(ast);
   return (0);
 }

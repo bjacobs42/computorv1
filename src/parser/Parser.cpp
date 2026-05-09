@@ -6,9 +6,8 @@
 
 Parser::Parser(const std::string &input)
 {
-  Lexer lexer(input);
-
-  _tokens = lexer.lex();
+  _init_lookup();
+  _tokens = Lexer(input).lex();
   _pos = 0;
 }
 
@@ -42,7 +41,7 @@ TokenType Parser::_look_ahead(void) const
 
 inline bool Parser::_has_tokens(void) const
 {
-  return (_peek_type() != TokenType::END || _pos < _tokens.size());
+  return (_peek_type() != TokenType::END && _pos < _tokens.size());
 }
 
 ast::ExprPtr Parser::_parse_expr(BindingPower bp)

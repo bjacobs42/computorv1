@@ -2,7 +2,7 @@
 #include "lexer/Token.hpp"
 #include <cctype>
 
-Lexer::Lexer(const std::string &input) : _input(input) {}
+Lexer::Lexer(const std::string &input) : _pos(0), _input(input) {}
 Lexer::~Lexer(void) {}
 
 CharClass Lexer::_classify(char character)
