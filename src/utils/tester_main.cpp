@@ -38,8 +38,12 @@ void fill_grid(
     value = ((ast::BinaryExpr *)expression.get())->op.get_value();
     break;
   case (int)ast::ExprKind::number:
-    value =
-        std::to_string((int)((ast::NumberExpr *)expression.get())->value);
+    value = std::to_string(
+        (double)((ast::NumberExpr *)expression.get())->value
+    );
+    value.erase(value.find_first_of('0'), std::string::npos);
+    if (value.back() == '.')
+      value += '0';
     break;
   case (int)ast::ExprKind::variable:
     value = ((ast::VariableExpr *)expression.get())->name;
@@ -48,7 +52,7 @@ void fill_grid(
     value = "unknown";
   }
 
-  for (size_t i = 0; i < value.size(); ++i)
+  for (size_t i = 0; i < value.size() && col + i < grid[row].size(); ++i)
     grid[row][col + i] = value[i];
 
   if (expression->kind != ast::ExprKind::binary)
@@ -72,7 +76,7 @@ void fill_grid(
 void print_ast(const ast::ExprPtr &expression)
 {
   int height = get_ast_height(expression);
-  int width = (1 << height) * 2;
+  int width = (1 << height) * 2 + 1;
   int rows = height * 2 - 1;
 
   // Blank canvas

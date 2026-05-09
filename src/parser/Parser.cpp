@@ -51,15 +51,13 @@ ast::ExprPtr Parser::_parse_expr(BindingPower bp)
     throw; // implement error handler
 
   ast::ExprPtr left = (this->*nud_fn)();
-  BindingPower current_bp = _lookup[(int)_peek_type()].bp;
-  while (bp < current_bp && _has_tokens())
+  while (_has_tokens() && bp < _lookup[(int)_peek_type()].bp)
   {
     LedFn led_fn = _lookup[(int)_peek_type()].led;
     if (!led_fn)
       throw; // implement error handler
 
-    left = (this->*led_fn)(std::move(left), current_bp);
-    current_bp = _lookup[(int)_peek_type()].bp;
+    left = (this->*led_fn)(std::move(left), _lookup[(int)_peek_type()].bp);
   }
   return (left);
 }
@@ -95,8 +93,9 @@ ast::ExprPtr Parser::_parse_binary_expr(ast::ExprPtr left, BindingPower bp)
 ast::ExprPtr
 Parser::_parse_implicit_expr(ast::ExprPtr left, BindingPower bp)
 {
-  if (_peek_type() == TokenType::NUMBER &&
-      _look_ahead() == TokenType::NUMBER)
+  TokenType ahead_type = _look_ahead();
+  if (ahead_type == TokenType::END || (_peek_type() == TokenType::NUMBER &&
+                                       ahead_type == TokenType::NUMBER))
   {
     throw; // Implement error
   }
@@ -154,7 +153,7 @@ void Parser::_init_lookup(void)
     &Parser::_parse_implicit_expr
   );
   _register_led(
-    TokenType::DASH,
+    TokenType::PLUS,
     BindingPower::additive,
     &Parser::_parse_binary_expr
   );
