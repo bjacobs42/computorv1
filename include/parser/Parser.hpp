@@ -20,11 +20,11 @@ public:
   explicit Parser(const std::string &input);
   ~Parser(void);
 
-  ast::Expr parse(void);
+  ast::ExprPtr parse(void);
 
 private:
-  using NudFn = ast::Expr (Parser::*)(void);
-  using LedFn = ast::Expr (Parser::*)(ast::Expr, BindingPower);
+  using NudFn = ast::ExprPtr (Parser::*)(void);
+  using LedFn = ast::ExprPtr (Parser::*)(ast::ExprPtr, BindingPower);
 
   struct Entry
   {
@@ -39,16 +39,16 @@ private:
 
   // navigation
   inline bool _has_tokens(void) const;
-  inline Token _peek(void) const;
+  inline const Token &_peek(void) const;
   inline TokenType _peek_type(void) const;
-  Token _consume(void);
+  const Token &_consume(void);
   TokenType _look_ahead(void) const;
 
   // handlers
-  ast::Expr _parse_expression(BindingPower bp);
-  ast::Expr _parse_number_expression(void);
-  ast::Expr _parse_binary_expression(ast::Expr left, BindingPower bp);
-  ast::Expr _parse_implicit_expression(ast::Expr left, BindingPower bp);
+  ast::ExprPtr _parse_expr(BindingPower bp);
+  ast::ExprPtr _parse_number_expr(void);
+  ast::ExprPtr _parse_binary_expr(ast::ExprPtr left, BindingPower bp);
+  ast::ExprPtr _parse_implicit_expr(ast::ExprPtr left, BindingPower bp);
 
   // registration
   void _register_nud(TokenType token_type, BindingPower bp, NudFn nud);

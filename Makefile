@@ -18,6 +18,9 @@ SRC_FILES	:= utils/tester_main.cpp \
 OBJS		:= $(addprefix $(OBJ_FR), $(SRC_FILES:.cpp=.o))
 
 all: ${NAME}
+ifdef DEBUG
+	@echo "$(CYAN)Using Debug...$(NC)"
+endif
 
 $(OBJ_FR)%.o : ${SRC_FR}%.cpp
 	@mkdir -p $(dir $@)

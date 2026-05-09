@@ -17,6 +17,7 @@ enum class TokenType
 class Token
 {
 public:
+  Token(void);
   Token(const std::string &value, int pos);
   Token(const std::string &value, int pos, TokenType type);
   ~Token(void);

@@ -1,28 +1,30 @@
 #include "ast/ast.hpp"
 #include "config.hpp"
 #include "lexer/Lexer.hpp"
+#include "parser/Parser.hpp"
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
 
-int get_ast_height(const ast::Expr *expression)
+int get_ast_height(const ast::ExprPtr &expression)
 {
   if (!expression)
     return (0);
   if (expression->kind != ast::ExprKind::binary)
     return (1);
+  ast::BinaryExpr *binary = (ast::BinaryExpr *)expression.get();
   // clang-format off
   return (1 + std::max(
-    get_ast_height(((ast::BinaryExpr*)expression)->left),
-    get_ast_height(((ast::BinaryExpr*)expression)->right)
+    get_ast_height(binary->left),
+    get_ast_height(binary->right)
   ));
   // clang-format on
 }
 
 void fill_grid(
-    std::vector<std::string> &grid, const ast::Expr *expression, int row,
-    int col, int gap
+    std::vector<std::string> &grid, const ast::ExprPtr &expression,
+    int row, int col, int gap
 )
 {
   if (!expression)
@@ -32,13 +34,14 @@ void fill_grid(
   switch ((int)expression->kind)
   {
   case (int)ast::ExprKind::binary:
-    value = ((ast::BinaryExpr *)expression)->op->get_value();
+    value = ((ast::BinaryExpr *)expression.get())->op.get_value();
     break;
   case (int)ast::ExprKind::number:
-    value = std::to_string(((ast::NumberExpr *)expression)->value);
+    value = std::to_string(((ast::NumberExpr *)expression.get())->value);
     break;
   case (int)ast::ExprKind::variable:
-    value = ((ast::VariableExpr *)expression)->name;
+    value = ((ast::VariableExpr *)expression.get())->name;
+    break;
   default:
     value = "unknown";
   }
@@ -50,24 +53,21 @@ void fill_grid(
     return;
 
   int half_gap = gap / 2;
-  const ast::BinaryExpr *left =
-      (ast::BinaryExpr *)((ast::BinaryExpr *)expression)->left;
-  const ast::BinaryExpr *right =
-      (ast::BinaryExpr *)((ast::BinaryExpr *)expression)->right;
+  ast::BinaryExpr *binary = (ast::BinaryExpr *)expression.get();
 
-  if (left)
+  if (binary->left)
   {
     grid[row + 1][col - half_gap] = '/';
-    fill_grid(grid, left, row + 2, col - gap, half_gap);
+    fill_grid(grid, binary->left, row + 2, col - gap, half_gap);
   }
-  if (right)
+  if (binary->right)
   {
     grid[row + 1][col + half_gap] = '\\';
-    fill_grid(grid, right, row + 2, col + gap, half_gap);
+    fill_grid(grid, binary->right, row + 2, col + gap, half_gap);
   }
 }
 
-void print_ast(const ast::Expr *expression)
+void print_ast(const ast::ExprPtr &expression)
 {
   int height = get_ast_height(expression);
   int width = (1 << height) * 2;
@@ -123,6 +123,13 @@ int main(int ac, char **argv)
     input += argv[i];
 
   std::vector<Token> tokens = Lexer(input).lex();
+  Parser parser(input);
   print_tokens(tokens);
+
+  std::cout << "parsing..." << std::endl;
+  ast::ExprPtr ast = parser.parse();
+
+  std::cout << "printing..." << std::endl;
+  print_ast(ast);
   return (0);
 }

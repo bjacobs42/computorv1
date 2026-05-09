@@ -1,6 +1,7 @@
 #pragma once
 
 #include "lexer/Token.hpp"
+#include <memory>
 
 namespace ast
 {
@@ -16,6 +17,8 @@ namespace ast
     ExprKind kind;
     virtual ~Expr(void) = default;
   };
+
+  using ExprPtr = std::unique_ptr<Expr>;
 
   struct NumberExpr : Expr
   {
@@ -42,16 +45,19 @@ namespace ast
   struct BinaryExpr : Expr
   {
     BinaryExpr(void) { kind = ExprKind::binary; };
-    BinaryExpr(Expr *new_left, Token *new_op, Expr *new_right)
+    BinaryExpr(ExprPtr left, Token op, ExprPtr right)
+        : left(std::move(left)), op(op), right(std::move(right))
     {
       kind = ExprKind::binary;
-      left = new_left;
-      op = new_op;
-      right = new_right;
-    };
+    }
 
-    Expr *left;
-    Token *op;
-    Expr *right;
+    ExprPtr left;
+    Token op;
+    ExprPtr right;
   };
+
+  template <typename T, typename... Args> ExprPtr new_expr(Args &&...args)
+  {
+    return (std::make_unique<T>(std::forward<Args>(args)...));
+  }
 } // namespace ast
