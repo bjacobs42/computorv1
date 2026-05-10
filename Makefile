@@ -14,6 +14,8 @@ SRC_FILES	:= utils/tester_main.cpp \
 						 lexer/Token.cpp \
 						 lexer/Lexer.cpp \
 						 parser/Parser.cpp \
+						 polynomial/Polynomial.cpp \
+						 polynomial/Term.cpp \
 
 OBJS		:= $(addprefix $(OBJ_FR), $(SRC_FILES:.cpp=.o))
 

@@ -1,5 +1,7 @@
 #include "polynomial/Term.hpp"
+#include <unordered_map>
 
+Term::~Term(void) {}
 Term::Term(void) : _coefficient(0), _degree({}) {}
 Term::Term(float coefficient, unsigned int degree, char variable)
     : _coefficient(coefficient), _degree({{variable, degree}})
@@ -35,3 +37,8 @@ Term Term::operator*(float num) const
 }
 
 float Term::get_coefficient(void) const { return (_coefficient); }
+
+const std::unordered_map<char, int> Term::get_degrees(void) const
+{
+  return (_degree);
+}

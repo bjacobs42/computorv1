@@ -14,6 +14,7 @@ public:
   Term operator*(float num) const;
 
   float get_coefficient(void) const;
+  const std::unordered_map<char, int> get_degrees(void) const;
 
 private:
   float _coefficient;

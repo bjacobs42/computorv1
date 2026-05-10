@@ -2,6 +2,7 @@
 #include "config.hpp"
 #include "lexer/Lexer.hpp"
 #include "parser/Parser.hpp"
+#include "polynomial/Polynomial.hpp"
 #include <exception>
 #include <iostream>
 #include <sstream>
@@ -137,13 +138,16 @@ int main(int ac, char **argv)
   {
     std::cout << "parsing..." << std::endl;
     ast = parser.parse();
+    std::cout << "AST Result:" << std::endl;
+    print_ast(ast);
+
+    Polynomial polynomial(ast);
+    std::cout << polynomial << std::endl;
   }
   catch (std::exception &e)
   {
     return (1);
   }
 
-  std::cout << "Result:" << std::endl;
-  print_ast(ast);
   return (0);
 }

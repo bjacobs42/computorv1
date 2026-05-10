@@ -1,9 +1,11 @@
 #include "polynomial/Polynomial.hpp"
 #include "ast/ast.hpp"
 #include "lexer/Token.hpp"
-#include "math.hpp"
 #include "polynomial/Term.hpp"
+#include "utils/math.hpp"
+
 #include <iterator>
+#include <unordered_map>
 #include <vector>
 
 Polynomial::Polynomial(void) {}
@@ -114,4 +116,28 @@ std::vector<Term> Polynomial::_ast_to_terms(const ast::ExprPtr &expr)
   default:
     throw std::runtime_error("What the hell did you do?");
   }
+}
+
+std::ostream &operator<<(std::ostream &os, const Polynomial &poly)
+{
+  int term_count = poly._terms.size();
+
+  for (int i = 0; i < term_count; ++i)
+  {
+    const Term &term = poly._terms[i];
+    float coefficient = term.get_coefficient();
+
+    if (i)
+      os << (coefficient > 0.0f ? " + " : " - ");
+    os << ft_math::abs(coefficient);
+
+    const std::unordered_map<char, int> degrees = term.get_degrees();
+    for (const auto &[var, deg] : degrees)
+    {
+      os << var;
+      if (deg > 1)
+        os << "^" << deg;
+    }
+  }
+  return (os);
 }

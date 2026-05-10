@@ -2,6 +2,7 @@
 
 #include "Term.hpp"
 #include "ast/ast.hpp"
+#include <ostream>
 #include <vector>
 
 class Polynomial
@@ -11,6 +12,9 @@ public:
   Polynomial(const std::vector<Term> &terms);
   Polynomial(const ast::ExprPtr &expr);
   ~Polynomial(void);
+
+  friend std::ostream &
+  operator<<(std::ostream &os, const Polynomial &poly);
 
 private:
   std::vector<Term> _terms;
