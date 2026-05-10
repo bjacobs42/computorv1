@@ -2,6 +2,7 @@
 #include "ast/ast.hpp"
 #include "lexer/Lexer.hpp"
 #include "lexer/Token.hpp"
+#include <stdexcept>
 #include <string>
 
 Parser::Parser(const std::string &input)
@@ -48,14 +49,14 @@ ast::ExprPtr Parser::_parse_expr(BindingPower bp)
 {
   NudFn nud_fn = _lookup[(int)_peek_type()].nud;
   if (!nud_fn)
-    throw; // implement error handler
+    throw std::runtime_error("No nud function found");
 
   ast::ExprPtr left = (this->*nud_fn)();
   while (_has_tokens() && bp < _lookup[(int)_peek_type()].bp)
   {
     LedFn led_fn = _lookup[(int)_peek_type()].led;
     if (!led_fn)
-      throw; // implement error handler
+      throw std::runtime_error("No led function found");
 
     left = (this->*led_fn)(std::move(left), _lookup[(int)_peek_type()].bp);
   }
@@ -76,7 +77,7 @@ ast::ExprPtr Parser::_parse_number_expr(void)
   case TokenType::VARIABLE:
     return (ast::new_expr<ast::VariableExpr>(token.get_value()[0]));
   default:
-    throw; // implement error handler!
+    throw std::runtime_error("Unknown TokenType in parse_number");
   }
 }
 
@@ -94,10 +95,9 @@ ast::ExprPtr
 Parser::_parse_implicit_expr(ast::ExprPtr left, BindingPower bp)
 {
   TokenType ahead_type = _look_ahead();
-  if (ahead_type == TokenType::END || (_peek_type() == TokenType::NUMBER &&
-                                       ahead_type == TokenType::NUMBER))
+  if (_peek_type() == TokenType::NUMBER && ahead_type == TokenType::NUMBER)
   {
-    throw; // Implement error
+    throw std::runtime_error("Bad implicit expr");
   }
 
   Token operatorToken = Token(std::string(1, '*'), 0);

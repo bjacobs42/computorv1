@@ -28,12 +28,12 @@ private:
 
   struct Entry
   {
-    BindingPower bp;
+    BindingPower bp = BindingPower::default_bp;
     NudFn nud = NULL;
     LedFn led = NULL;
   };
 
-  std::array<Entry, (int)TokenType::END> _lookup;
+  std::array<Entry, (int)TokenType::END + 1> _lookup;
   std::vector<Token> _tokens;
   size_t _pos;
 

@@ -74,5 +74,7 @@ std::vector<Token> Lexer::lex()
     Token tok = (this->*_token_handlers[(int)char_class])();
     tokens.push_back(tok);
   }
+  if (tokens.back().get_type() != TokenType::END)
+    tokens.push_back(Token("", _pos, TokenType::END));
   return (tokens);
 }

@@ -129,7 +129,8 @@ std::ostream &operator<<(std::ostream &os, const Polynomial &poly)
 
     if (i)
       os << (coefficient > 0.0f ? " + " : " - ");
-    os << ft_math::abs(coefficient);
+    if (ft_math::abs(coefficient) != 1.0f)
+      os << ft_math::abs(coefficient);
 
     const std::unordered_map<char, int> degrees = term.get_degrees();
     for (const auto &[var, deg] : degrees)
