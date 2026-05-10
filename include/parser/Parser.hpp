@@ -49,6 +49,7 @@ private:
   ast::ExprPtr _parse_number_expr(void);
   ast::ExprPtr _parse_binary_expr(ast::ExprPtr left, BindingPower bp);
   ast::ExprPtr _parse_implicit_expr(ast::ExprPtr left, BindingPower bp);
+  ast::ExprPtr _parse_power_expr(ast::ExprPtr left, BindingPower bp);
 
   // registration
   void _register_nud(TokenType token_type, BindingPower bp, NudFn nud);
