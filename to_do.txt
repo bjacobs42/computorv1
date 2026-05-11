@@ -1,0 +1,12 @@
+- implement Term subtraction
+- implement Polynomial subtraction
+- implement Polynomial simplification
+- implement Polynomial comparison
+- implement Polynomial solver
+- complete main function
+
+-- bonus
+
+- implement visualization
+- handle free form
+- implement multi-variable polynomial
