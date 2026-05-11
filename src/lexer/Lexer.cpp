@@ -39,7 +39,7 @@ Token Lexer::_handle_number(void)
 Token Lexer::_handle_variable(void)
 {
   size_t index = _pos;
-  char character = _input[_pos++];
+  char character = std::tolower(_input[_pos++]);
 
   return (Token(std::string(1, character), index, TokenType::VARIABLE));
 }

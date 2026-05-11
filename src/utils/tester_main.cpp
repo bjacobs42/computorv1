@@ -143,6 +143,8 @@ int main(int ac, char **argv)
 
     Polynomial polynomial(ast);
     std::cout << polynomial << std::endl;
+    std::cout << "Polynomial degree: " << polynomial.get_max_degree()
+              << std::endl;
   }
   catch (std::exception &e)
   {

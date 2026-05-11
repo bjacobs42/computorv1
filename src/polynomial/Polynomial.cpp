@@ -4,16 +4,34 @@
 #include "polynomial/Term.hpp"
 #include "utils/math.hpp"
 
+#include <algorithm>
+#include <iostream>
 #include <iterator>
-#include <unordered_map>
 #include <vector>
 
 Polynomial::Polynomial(void) {}
 Polynomial::~Polynomial(void) {}
-Polynomial::Polynomial(const std::vector<Term> &terms) : _terms(terms) {}
+
+Polynomial::Polynomial(const std::vector<Term> &terms) : _terms(terms)
+{
+  _set_max_degree();
+}
+
 Polynomial::Polynomial(const ast::ExprPtr &expr)
     : _terms(_ast_to_terms(expr))
 {
+  _set_max_degree();
+}
+
+unsigned int Polynomial::get_max_degree(void) const
+{
+  return (_max_degree);
+}
+
+void Polynomial::_set_max_degree(void)
+{
+  for (const Term &term : _terms)
+    _max_degree = std::max(_max_degree, term.get_max_degree());
 }
 
 std::vector<Term> Polynomial::_handle_multiply(
@@ -61,7 +79,7 @@ std::vector<Term> Polynomial::_handle_power(const ast::BinaryExpr *binary)
   {
     const ast::VariableExpr *var_expr =
         (const ast::VariableExpr *)binary->left.get();
-    return {{1.0f, right, var_expr->name}};
+    return {{1.0f, var_expr->name, right}};
   }
   default:
     throw std::runtime_error("Unsupported base in power expression");
@@ -112,7 +130,7 @@ std::vector<Term> Polynomial::_ast_to_terms(const ast::ExprPtr &expr)
   case (int)ast::ExprKind::number:
     return {{((ast::NumberExpr *)expr.get())->value}};
   case (int)ast::ExprKind::variable:
-    return {{1.0f, 1, ((ast::VariableExpr *)expr.get())->name}};
+    return {{1.0f, ((ast::VariableExpr *)expr.get())->name}};
   default:
     throw std::runtime_error("What the hell did you do?");
   }
@@ -132,12 +150,15 @@ std::ostream &operator<<(std::ostream &os, const Polynomial &poly)
     if (ft_math::abs(coefficient) != 1.0f)
       os << ft_math::abs(coefficient);
 
-    const std::unordered_map<char, int> degrees = term.get_degrees();
-    for (const auto &[var, deg] : degrees)
+    int prev_degree = 1;
+    for (const auto &[var, deg] : term.get_degrees())
     {
+      if (prev_degree != 1)
+        os << " * ";
       os << var;
-      if (deg > 1)
+      if (deg != 1)
         os << "^" << deg;
+      prev_degree = deg;
     }
   }
   return (os);

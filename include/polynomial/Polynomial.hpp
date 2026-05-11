@@ -13,11 +13,14 @@ public:
   Polynomial(const ast::ExprPtr &expr);
   ~Polynomial(void);
 
+  unsigned int get_max_degree(void) const;
+
   friend std::ostream &
   operator<<(std::ostream &os, const Polynomial &poly);
 
 private:
   std::vector<Term> _terms;
+  unsigned int _max_degree;
 
   std::vector<Term> _ast_to_terms(const ast::ExprPtr &expr);
 
@@ -28,4 +31,6 @@ private:
   std::vector<Term> _handle_binary(const ast::ExprPtr &expr);
 
   unsigned int _eval_constant_power(const ast::ExprPtr &expr);
+
+  void _set_max_degree(void);
 };
