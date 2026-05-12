@@ -1,5 +1,6 @@
-- implement Term subtraction
-- implement Polynomial subtraction
+- implement Term subtraction - done
+- implement Polynomial subtraction - done
+
 - implement Polynomial simplification
 - implement Polynomial comparison
 - implement Polynomial solver

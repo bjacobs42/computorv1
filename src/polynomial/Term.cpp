@@ -47,6 +47,19 @@ Term Term::operator*(float num) const
   return (result);
 }
 
+Term &Term::operator-=(const Term &right)
+{
+  _coefficient -= right.get_coefficient();
+  return (*this);
+}
+
+Term Term::operator-(const Term &right)
+{
+  Term result = *this;
+  result -= right;
+  return (right);
+}
+
 unsigned int Term::get_max_degree(void) const { return (_max_degree); }
 
 float Term::get_coefficient(void) const { return (_coefficient); }

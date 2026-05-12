@@ -16,6 +16,9 @@ public:
   Term operator*(const Term &right) const;
   Term operator*(float num) const;
 
+  Term &operator-=(const Term &right);
+  Term operator-(const Term &right);
+
   unsigned int get_max_degree(void) const;
   float get_coefficient(void) const;
   const std::unordered_map<char, unsigned int> get_degrees(void) const;

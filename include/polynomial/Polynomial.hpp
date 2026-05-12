@@ -18,6 +18,9 @@ public:
   friend std::ostream &
   operator<<(std::ostream &os, const Polynomial &poly);
 
+  Polynomial &operator-=(const Polynomial &right);
+  Polynomial operator-(const Polynomial &right);
+
 private:
   std::vector<Term> _terms;
   unsigned int _max_degree;

@@ -1,12 +1,16 @@
 #include "lexer/Token.hpp"
 #include <cctype>
+#include <stdexcept>
 #include <string>
 
 Token::~Token(void) {}
 
-Token::Token(const std::string &value, int pos)
-    : _location(pos), _type(Token::get_type(value[0]))
+Token::Token(const std::string &value, int pos) : _location(pos)
 {
+  if (value.empty())
+    throw std::runtime_error("Token: Empty value");
+
+  _type = Token::get_type(value[0]);
   _value = value;
 }
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdexcept>
 #include <string>
 
 enum class TokenType
@@ -41,7 +42,7 @@ public:
     case ';':
       return (TokenType::END);
     default:
-      throw std::exception();
+      throw std::runtime_error("Token: unknown character");
     }
   }
 

@@ -1,6 +1,7 @@
 #include "lexer/Lexer.hpp"
 #include "lexer/Token.hpp"
 #include <cctype>
+#include <stdexcept>
 
 Lexer::Lexer(const std::string &input) : _pos(0), _input(input) {}
 Lexer::~Lexer(void) {}
@@ -74,6 +75,8 @@ std::vector<Token> Lexer::lex()
     Token tok = (this->*_token_handlers[(int)char_class])();
     tokens.push_back(tok);
   }
+  if (!tokens.size())
+    throw std::runtime_error("Lexer: Empty string");
   if (tokens.back().get_type() != TokenType::END)
     tokens.push_back(Token("", _pos, TokenType::END));
   return (tokens);

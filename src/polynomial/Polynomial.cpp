@@ -28,6 +28,29 @@ unsigned int Polynomial::get_max_degree(void) const
   return (_max_degree);
 }
 
+Polynomial &Polynomial::operator-=(const Polynomial &right)
+{
+  int right_size = right._terms.size();
+  int left_size = _terms.size();
+  int i;
+
+  for (i = 0; i < left_size && i < right_size; ++i)
+    _terms[i] -= right._terms[i];
+  while (i < right_size)
+  {
+    _terms.push_back(right._terms[i] * -1.0f);
+    ++i;
+  }
+  return (*this);
+}
+
+Polynomial Polynomial::operator-(const Polynomial &right)
+{
+  Polynomial result = *this;
+  result -= right;
+  return (result);
+}
+
 void Polynomial::_set_max_degree(void)
 {
   for (const Term &term : _terms)
@@ -146,7 +169,7 @@ std::ostream &operator<<(std::ostream &os, const Polynomial &poly)
     float coefficient = term.get_coefficient();
 
     if (i)
-      os << (coefficient > 0.0f ? " + " : " - ");
+      os << (coefficient >= 0.0f ? " + " : " - ");
     if (ft_math::abs(coefficient) != 1.0f)
       os << ft_math::abs(coefficient);
 
