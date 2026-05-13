@@ -13,7 +13,9 @@ public:
   Polynomial(const ast::ExprPtr &expr);
   ~Polynomial(void);
 
-  unsigned int get_max_degree(void) const;
+  void simplify(void);
+
+  unsigned int get_degree(void) const { return (_degree); }
 
   friend std::ostream &
   operator<<(std::ostream &os, const Polynomial &poly);
@@ -21,13 +23,18 @@ public:
   Polynomial &operator-=(const Polynomial &right);
   Polynomial operator-(const Polynomial &right);
 
+  bool operator==(const Polynomial &right)
+  {
+    return (_degree == right._degree && _terms == right._terms);
+  }
+
 private:
   std::vector<Term> _terms;
-  unsigned int _max_degree;
+  unsigned int _degree;
 
   std::vector<Term> _ast_to_terms(const ast::ExprPtr &expr);
 
-  std::vector<Term> _handle_power(const ast::BinaryExpr *binary);
+  Term _handle_power(const ast::BinaryExpr *binary);
   std::vector<Term> _handle_multiply(
       const std::vector<Term> &left, const std::vector<Term> &right
   );
@@ -35,5 +42,5 @@ private:
 
   unsigned int _eval_constant_power(const ast::ExprPtr &expr);
 
-  void _set_max_degree(void);
+  void _set_degree(void);
 };

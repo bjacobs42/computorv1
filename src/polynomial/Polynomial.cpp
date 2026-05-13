@@ -5,6 +5,7 @@
 #include "utils/math.hpp"
 
 #include <algorithm>
+#include <functional>
 #include <iostream>
 #include <iterator>
 #include <vector>
@@ -14,18 +15,31 @@ Polynomial::~Polynomial(void) {}
 
 Polynomial::Polynomial(const std::vector<Term> &terms) : _terms(terms)
 {
-  _set_max_degree();
+  _set_degree();
+}
+
+void Polynomial::simplify(void)
+{
+  std::map<std::map<char, unsigned int>, float> accumulator;
+
+  for (const Term &term : _terms)
+    accumulator[term.get_variables()] += term.get_coefficient();
+
+  _terms.clear();
+  for (const auto &[vars, coeff] : accumulator)
+  {
+    if (ft_math::flt_equal(coeff, 0.0f))
+      continue;
+
+    _terms.emplace_back(coeff, vars);
+  }
+  std::sort(_terms.begin(), _terms.end(), std::greater<Term>());
 }
 
 Polynomial::Polynomial(const ast::ExprPtr &expr)
     : _terms(_ast_to_terms(expr))
 {
-  _set_max_degree();
-}
-
-unsigned int Polynomial::get_max_degree(void) const
-{
-  return (_max_degree);
+  _set_degree();
 }
 
 Polynomial &Polynomial::operator-=(const Polynomial &right)
@@ -51,10 +65,10 @@ Polynomial Polynomial::operator-(const Polynomial &right)
   return (result);
 }
 
-void Polynomial::_set_max_degree(void)
+void Polynomial::_set_degree(void)
 {
   for (const Term &term : _terms)
-    _max_degree = std::max(_max_degree, term.get_max_degree());
+    _degree = std::max(_degree, term.get_max_exponent());
 }
 
 std::vector<Term> Polynomial::_handle_multiply(
@@ -86,9 +100,11 @@ unsigned int Polynomial::_eval_constant_power(const ast::ExprPtr &expr)
   return (ft_math::power(base, exponent));
 }
 
-std::vector<Term> Polynomial::_handle_power(const ast::BinaryExpr *binary)
+Term Polynomial::_handle_power(const ast::BinaryExpr *binary)
 {
-  unsigned int right = _eval_constant_power(binary->right);
+  unsigned int exponent = _eval_constant_power(binary->right);
+  if (exponent == 0)
+    return (Term(1.0f));
 
   switch ((int)binary->left->kind)
   {
@@ -96,13 +112,13 @@ std::vector<Term> Polynomial::_handle_power(const ast::BinaryExpr *binary)
   {
     const ast::NumberExpr *num_expr =
         (const ast::NumberExpr *)binary->left.get();
-    return {{ft_math::power(num_expr->value, right)}};
+    return (Term(ft_math::power(num_expr->value, exponent)));
   }
   case (int)ast::ExprKind::variable:
   {
     const ast::VariableExpr *var_expr =
         (const ast::VariableExpr *)binary->left.get();
-    return {{1.0f, var_expr->name, right}};
+    return (Term(1.0f, var_expr->name, exponent));
   }
   default:
     throw std::runtime_error("Unsupported base in power expression");
@@ -115,7 +131,7 @@ std::vector<Term> Polynomial::_handle_binary(const ast::ExprPtr &expr)
   TokenType operator_type = binary->op.get_type();
 
   if (operator_type == TokenType::CARET)
-    return (_handle_power(binary));
+    return {_handle_power(binary)};
 
   std::vector<Term> left = _ast_to_terms(binary->left);
   std::vector<Term> right = _ast_to_terms(binary->right);
@@ -170,18 +186,18 @@ std::ostream &operator<<(std::ostream &os, const Polynomial &poly)
 
     if (i)
       os << (coefficient >= 0.0f ? " + " : " - ");
-    if (ft_math::abs(coefficient) != 1.0f)
+    if (term.is_constant() || ft_math::flt_equal(coefficient, 1.0f))
       os << ft_math::abs(coefficient);
 
-    int prev_degree = 1;
-    for (const auto &[var, deg] : term.get_degrees())
+    int prev_exponent = 1;
+    for (const auto &[var, exp] : term.get_variables())
     {
-      if (prev_degree != 1)
+      if (prev_exponent != 1)
         os << " * ";
       os << var;
-      if (deg != 1)
-        os << "^" << deg;
-      prev_degree = deg;
+      if (exp != 1)
+        os << "^" << exp;
+      prev_exponent = exp;
     }
   }
   return (os);

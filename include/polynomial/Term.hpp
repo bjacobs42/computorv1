@@ -1,14 +1,16 @@
 #pragma once
 
+#include <map>
 #include <ostream>
-#include <unordered_map>
 
 class Term
 {
 public:
   Term(void);
-  Term(float coefficient);
   Term(float coefficient, char variable, unsigned int degree = 1);
+  Term(
+      float coefficient, const std::map<char, unsigned int> &variables = {}
+  );
   ~Term(void);
 
   Term &operator*=(const Term &right);
@@ -19,14 +21,25 @@ public:
   Term &operator-=(const Term &right);
   Term operator-(const Term &right);
 
-  unsigned int get_max_degree(void) const;
-  float get_coefficient(void) const;
-  const std::unordered_map<char, unsigned int> get_degrees(void) const;
+  bool operator==(const Term &right) const;
+  bool operator>(const Term &right) const
+  {
+    return (_max_exponent > right._max_exponent);
+  }
+
+  bool is_constant(void) const { return (_variables.empty()); }
+
+  unsigned int get_max_exponent(void) const { return (_max_exponent); }
+  float get_coefficient(void) const { return (_coefficient); }
+  const std::map<char, unsigned int> &get_variables(void) const
+  {
+    return (_variables);
+  }
 
   friend std::ostream &operator<<(std::ostream &os, const Term &term);
 
 private:
   float _coefficient;
-  std::unordered_map<char, unsigned int> _degree;
-  unsigned int _max_degree;
+  std::map<char, unsigned int> _variables;
+  unsigned int _max_exponent;
 };

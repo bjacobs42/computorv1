@@ -20,6 +20,3 @@ Token::Token(const std::string &value, int pos, TokenType type)
   _type = type;
   _value = value;
 }
-
-TokenType Token::get_type(void) const { return _type; };
-const std::string &Token::get_value(void) const { return (_value); }

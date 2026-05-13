@@ -142,8 +142,10 @@ int main(int ac, char **argv)
     print_ast(ast);
 
     Polynomial polynomial(ast);
-    std::cout << polynomial << std::endl;
-    std::cout << "Polynomial degree: " << polynomial.get_max_degree()
+    std::cout << "reduced form: " << polynomial << std::endl;
+    polynomial.simplify();
+    std::cout << "simplified form: " << polynomial << std::endl;
+    std::cout << "Polynomial degree: " << polynomial.get_degree()
               << std::endl;
   }
   catch (std::exception &e)

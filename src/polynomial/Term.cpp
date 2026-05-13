@@ -1,28 +1,33 @@
 #include "polynomial/Term.hpp"
+#include "utils/math.hpp"
 #include <algorithm>
 #include <ostream>
-#include <unordered_map>
 
 Term::~Term(void) {}
-Term::Term(void) : _coefficient(0), _max_degree(0) {}
+Term::Term(void) : _coefficient(0), _max_exponent(0) {}
 
-Term::Term(float coefficient) : _coefficient(coefficient), _max_degree(0)
+Term::Term(float coefficient, char variable, unsigned int exponent)
+    : _coefficient(coefficient), _variables({{variable, exponent}}),
+      _max_exponent(exponent)
 {
 }
 
-Term::Term(float coefficient, char variable, unsigned int degree)
-    : _coefficient(coefficient), _degree({{variable, degree}}),
-      _max_degree(degree)
+Term::Term(
+    float coefficient, const std::map<char, unsigned int> &variables
+)
+    : _coefficient(coefficient), _variables(variables), _max_exponent(0)
 {
+  for (const auto &[var, exp] : variables)
+    _max_exponent = std::max(_max_exponent, exp);
 }
 
 Term &Term::operator*=(const Term &right)
 {
   this->_coefficient *= right._coefficient;
-  for (const auto &[var, deg] : right._degree)
+  for (const auto &[var, exp] : right._variables)
   {
-    _degree[var] += deg;
-    _max_degree = std::max(_max_degree, _degree[var]);
+    _variables[var] += exp;
+    _max_exponent = std::max(_max_exponent, _variables[var]);
   }
   return (*this);
 }
@@ -60,29 +65,28 @@ Term Term::operator-(const Term &right)
   return (right);
 }
 
-unsigned int Term::get_max_degree(void) const { return (_max_degree); }
-
-float Term::get_coefficient(void) const { return (_coefficient); }
-
-const std::unordered_map<char, unsigned int> Term::get_degrees(void) const
+bool Term::operator==(const Term &right) const
 {
-  return (_degree);
+  return (
+      ft_math::flt_equal(_coefficient, right._coefficient) &&
+      _variables == right._variables
+  );
 }
 
 std::ostream &operator<<(std::ostream &os, const Term &term)
 {
-  int prev_degree = 1;
+  int prev_exponent = 1;
 
   os << term.get_coefficient();
-  for (const auto &[var, deg] : term.get_degrees())
+  for (const auto &[var, deg] : term.get_variables())
   {
-    if (prev_degree != 1)
+    if (prev_exponent != 1)
       os << " * ";
     os << "(" << (int)var << ")";
     os << var;
     if (deg != 1)
       os << "^" << deg;
-    prev_degree = deg;
+    prev_exponent = deg;
   }
   return (os);
 }
