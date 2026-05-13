@@ -12,9 +12,7 @@ Term::Term(float coefficient, char variable, unsigned int exponent)
 {
 }
 
-Term::Term(
-    float coefficient, const std::map<char, unsigned int> &variables
-)
+Term::Term(float coefficient, const std::map<char, unsigned int> &variables)
     : _coefficient(coefficient), _variables(variables), _max_exponent(0)
 {
   for (const auto &[var, exp] : variables)

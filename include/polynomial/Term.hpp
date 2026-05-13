@@ -8,9 +8,7 @@ class Term
 public:
   Term(void);
   Term(float coefficient, char variable, unsigned int degree = 1);
-  Term(
-      float coefficient, const std::map<char, unsigned int> &variables = {}
-  );
+  Term(float coefficient, const std::map<char, unsigned int> &variables = {});
   ~Term(void);
 
   Term &operator*=(const Term &right);

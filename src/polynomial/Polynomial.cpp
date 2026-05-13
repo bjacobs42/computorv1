@@ -19,8 +19,7 @@ Polynomial::Polynomial(const std::vector<Term> &terms) : _terms(terms)
   _set_degree();
 }
 
-Polynomial::Polynomial(const ast::ExprPtr &expr)
-    : _terms(_ast_to_terms(expr))
+Polynomial::Polynomial(const ast::ExprPtr &expr) : _terms(_ast_to_terms(expr))
 {
   _set_degree();
 }

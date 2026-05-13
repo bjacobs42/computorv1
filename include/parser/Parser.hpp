@@ -38,9 +38,12 @@ private:
   size_t _pos;
 
   // navigation
-  inline bool _has_tokens(void) const;
-  inline const Token &_peek(void) const;
-  inline TokenType _peek_type(void) const;
+  bool _has_tokens(void) const
+  {
+    return (_peek_type() != TokenType::END && _pos < _tokens.size());
+  }
+  const Token &_peek(void) const { return (_tokens[_pos]); }
+  TokenType _peek_type(void) const { return (_peek().get_type()); };
   const Token &_consume(void);
   TokenType _look_ahead(void) const;
 

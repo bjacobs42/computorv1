@@ -25,8 +25,11 @@ int get_ast_height(const ast::ExprPtr &expression)
 }
 
 void fill_grid(
-    std::vector<std::string> &grid, const ast::ExprPtr &expression,
-    int row, int col, int gap
+    std::vector<std::string> &grid,
+    const ast::ExprPtr &expression,
+    int row,
+    int col,
+    int gap
 )
 {
   if (!expression)
@@ -39,9 +42,8 @@ void fill_grid(
     value = ((ast::BinaryExpr *)expression.get())->op.get_value();
     break;
   case (int)ast::ExprKind::number:
-    value = std::to_string(
-        (double)((ast::NumberExpr *)expression.get())->value
-    );
+    value =
+        std::to_string((double)((ast::NumberExpr *)expression.get())->value);
     value.erase(value.find_first_of('0'), std::string::npos);
     if (value.back() == '.')
       value += '0';
@@ -103,8 +105,8 @@ void print_tokens(const std::vector<Token> &tokens)
 
   std::stringstream outstream;
   for (const Token &token : tokens)
-    outstream << token_types[(int)token.get_type()] << " "
-              << token.get_value() << std::endl;
+    outstream << token_types[(int)token.get_type()] << " " << token.get_value()
+              << std::endl;
   std::cout << outstream.str();
 }
 
@@ -145,8 +147,7 @@ int main(int ac, char **argv)
     std::cout << "reduced form: " << polynomial << std::endl;
     polynomial.simplify();
     std::cout << "simplified form: " << polynomial << std::endl;
-    std::cout << "Polynomial degree: " << polynomial.get_degree()
-              << std::endl;
+    std::cout << "Polynomial degree: " << polynomial.get_degree() << std::endl;
   }
   catch (std::exception &e)
   {

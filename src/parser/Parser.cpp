@@ -19,8 +19,6 @@ ast::ExprPtr Parser::parse(void)
   return (_parse_expr(BindingPower::default_bp));
 }
 
-inline const Token &Parser::_peek(void) const { return (_tokens[_pos]); }
-
 const Token &Parser::_consume(void)
 {
   const Token &token = _tokens[_pos];
@@ -28,21 +26,11 @@ const Token &Parser::_consume(void)
   return (token);
 }
 
-inline TokenType Parser::_peek_type(void) const
-{
-  return (_peek().get_type());
-}
-
 TokenType Parser::_look_ahead(void) const
 {
   if (_pos + 1 >= _tokens.size())
     return (TokenType::END);
   return (_tokens[_pos + 1].get_type());
-}
-
-inline bool Parser::_has_tokens(void) const
-{
-  return (_peek_type() != TokenType::END && _pos < _tokens.size());
 }
 
 ast::ExprPtr Parser::_parse_expr(BindingPower bp)
@@ -91,8 +79,7 @@ ast::ExprPtr Parser::_parse_binary_expr(ast::ExprPtr left, BindingPower bp)
   ));
 }
 
-ast::ExprPtr
-Parser::_parse_implicit_expr(ast::ExprPtr left, BindingPower bp)
+ast::ExprPtr Parser::_parse_implicit_expr(ast::ExprPtr left, BindingPower bp)
 {
   TokenType ahead_type = _look_ahead();
   if (_peek_type() == TokenType::NUMBER && ahead_type == TokenType::NUMBER)
@@ -108,9 +95,7 @@ Parser::_parse_implicit_expr(ast::ExprPtr left, BindingPower bp)
   ));
 }
 
-void Parser::_register_nud(
-    TokenType token_type, BindingPower bp, NudFn nud
-)
+void Parser::_register_nud(TokenType token_type, BindingPower bp, NudFn nud)
 {
   Entry *entry = &_lookup[(int)token_type];
 
@@ -118,9 +103,7 @@ void Parser::_register_nud(
   entry->nud = nud;
 }
 
-void Parser::_register_led(
-    TokenType token_type, BindingPower bp, LedFn led
-)
+void Parser::_register_led(TokenType token_type, BindingPower bp, LedFn led)
 {
   Entry *entry = &_lookup[(int)token_type];
 
