@@ -28,6 +28,7 @@ public:
   }
 
   bool is_constant(void) const { return (_variables.empty()); }
+  bool is_multivariable(void) const { return (_variables.size() > 1); }
 
   unsigned int get_max_exponent(void) const { return (_max_exponent); }
   float get_coefficient(void) const { return (_coefficient); }

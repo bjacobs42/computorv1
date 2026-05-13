@@ -1,6 +1,7 @@
 #include "polynomial/Polynomial.hpp"
 #include "ast/ast.hpp"
 #include "lexer/Token.hpp"
+#include "polynomial/PolynomialMessages.hpp"
 #include "polynomial/Term.hpp"
 #include "utils/math.hpp"
 
@@ -14,6 +15,12 @@ Polynomial::Polynomial(void) {}
 Polynomial::~Polynomial(void) {}
 
 Polynomial::Polynomial(const std::vector<Term> &terms) : _terms(terms)
+{
+  _set_degree();
+}
+
+Polynomial::Polynomial(const ast::ExprPtr &expr)
+    : _terms(_ast_to_terms(expr))
 {
   _set_degree();
 }
@@ -36,10 +43,83 @@ void Polynomial::simplify(void)
   std::sort(_terms.begin(), _terms.end(), std::greater<Term>());
 }
 
-Polynomial::Polynomial(const ast::ExprPtr &expr)
-    : _terms(_ast_to_terms(expr))
+Solution Polynomial::_solve_monomial(void) const
 {
-  _set_degree();
+  float a = _get_coefficient_by_degree(1);
+  float b = _get_coefficient_by_degree(0);
+
+  if (ft_math::flt_equal(a, 0.0f))
+    return (Solution(NO_SOLUTIONS, {}, false));
+  return (Solution(SOLUTION_IS, {-b / a}, true));
+}
+
+Solution Polynomial::_solve_quadratic(void) const
+{
+  Solution solution;
+
+  return (solution);
+}
+
+Solution Polynomial::solve(void)
+{
+  Solution solution;
+
+  if (_degree > 2)
+  {
+    solution.message = DEGREE_TOO_HIGH;
+    return (solution);
+  }
+  if (is_multivariable())
+  {
+    solution.message = HAS_MULTIVARIABLE;
+    return (solution);
+  }
+
+  switch (_degree)
+  {
+  case 0:
+    solution.solved = _terms.empty();
+    solution.message = solution.solved ? INFINITE_SOLUTIONS : NO_SOLUTIONS;
+  case 1:
+    solution = _solve_monomial();
+  default:
+    solution = _solve_quadratic();
+  }
+
+  return (solution);
+}
+
+float Polynomial::get_discriminant(void) const
+{
+  if (_degree != 2)
+  {
+    throw std::runtime_error(
+        "Can't get the discriminant of a non-quadratic polynomial"
+    );
+  }
+
+  if (is_multivariable())
+  {
+    throw std::runtime_error(
+        "Can't get the discriminant of a multivariable polynomial"
+    );
+  }
+
+  float a = _get_coefficient_by_degree(2);
+  float b = _get_coefficient_by_degree(1);
+  float c = _get_coefficient_by_degree(0);
+
+  return (ft_math::square(b) - 4.0f * a * c);
+}
+
+bool Polynomial::is_multivariable(void) const
+{
+  for (const Term &term : _terms)
+  {
+    if (term.is_multivariable())
+      return (true);
+  }
+  return (false);
 }
 
 Polynomial &Polynomial::operator-=(const Polynomial &right)
@@ -72,7 +152,8 @@ void Polynomial::_set_degree(void)
 }
 
 std::vector<Term> Polynomial::_handle_multiply(
-    const std::vector<Term> &left, const std::vector<Term> &right
+    const std::vector<Term> &left,
+    const std::vector<Term> &right
 )
 {
   std::vector<Term> result;
@@ -84,6 +165,26 @@ std::vector<Term> Polynomial::_handle_multiply(
       result.push_back(left_term * right_term);
   }
   return (result);
+}
+
+std::vector<Term>::const_iterator
+Polynomial::_get_term_by_degree(unsigned int exponent) const
+{
+  std::vector<Term>::const_iterator it = _terms.begin();
+  for (; it != _terms.end(); ++it)
+  {
+    if (it->get_max_exponent() == exponent)
+      return (it);
+  }
+  return (_terms.end());
+}
+
+float Polynomial::_get_coefficient_by_degree(unsigned int exponent) const
+{
+  std::vector<Term>::const_iterator it = _get_term_by_degree(exponent);
+  if (it == _terms.end())
+    return (0.0f);
+  return (it->get_coefficient());
 }
 
 unsigned int Polynomial::_eval_constant_power(const ast::ExprPtr &expr)
@@ -178,6 +279,12 @@ std::vector<Term> Polynomial::_ast_to_terms(const ast::ExprPtr &expr)
 std::ostream &operator<<(std::ostream &os, const Polynomial &poly)
 {
   int term_count = poly._terms.size();
+
+  if (term_count == 0)
+  {
+    os << '0';
+    return (os);
+  }
 
   for (int i = 0; i < term_count; ++i)
   {

@@ -2,9 +2,10 @@
 - implement Polynomial subtraction - done
 - implement Term comparison - done
 - implement Polynomial simplification - done
-- implement Polynomial comparison - done
+- implement Polynomial comparison - improvable
 
-- implement Polynomial solver
+- implement Polynomial solver - WIP
+
 - complete main function
 
 -- bonus
