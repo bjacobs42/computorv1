@@ -2,24 +2,20 @@
 
 #include "Term.hpp"
 #include "ast/ast.hpp"
+#include "math.hpp"
 #include <ostream>
 #include <vector>
 
 struct Solution
 {
   Solution(void) {}
-  Solution(
-      const std::string &msg,
-      const std::vector<float> &results,
-      bool solved
-  )
-      : message(msg), results(results), solved(solved)
+  Solution(const std::string &msg, const std::vector<float> &results = {})
+      : message(msg), results(results)
   {
   }
 
   std::string message;
   std::vector<float> results;
-  bool solved = false;
 };
 
 class Polynomial
@@ -36,10 +32,13 @@ public:
   bool is_multivariable(void) const;
 
   float get_discriminant(void) const;
+  float get_discriminant(float a, float b, float c) const
+  {
+    return (ft_math::square(b) - 4.0f * a * c);
+  }
   unsigned int get_degree(void) const { return (_degree); }
 
-  friend std::ostream &
-  operator<<(std::ostream &os, const Polynomial &poly);
+  friend std::ostream &operator<<(std::ostream &os, const Polynomial &poly);
 
   Polynomial &operator-=(const Polynomial &right);
   Polynomial operator-(const Polynomial &right);

@@ -30,7 +30,12 @@ namespace ft_math
   }
 
   template <typename Type = double>
-  Type sqrt(const Type &base, const int &expression);
+  Type root(const Type &base, unsigned int exponent);
+
+  template <typename Type = double> constexpr Type sqrt(const Type &base)
+  {
+    return (root(base, 2));
+  }
 
   template <typename Type = float>
   constexpr bool flt_equal(const Type &a, const Type &b)

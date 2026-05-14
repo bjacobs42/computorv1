@@ -9,6 +9,7 @@
 #include <functional>
 #include <iostream>
 #include <iterator>
+#include <strstream>
 #include <vector>
 
 Polynomial::Polynomial(void) {}
@@ -48,44 +49,58 @@ Solution Polynomial::_solve_monomial(void) const
   float b = _get_coefficient_by_degree(0);
 
   if (ft_math::flt_equal(a, 0.0f))
-    return (Solution(NO_SOLUTIONS, {}, false));
-  return (Solution(SOLUTION_IS, {-b / a}, true));
+    return {UNDIFINED};
+  return {SOLUTION_IS, {-b / a}};
 }
 
 Solution Polynomial::_solve_quadratic(void) const
 {
-  Solution solution;
+  float a = _get_coefficient_by_degree(2);
+  float b = _get_coefficient_by_degree(1);
+  float c = _get_coefficient_by_degree(0);
 
-  return (solution);
+  if (ft_math::flt_equal(a, 0.0f))
+    return {UNDIFINED};
+
+  float denominator = 2 * a;
+  float discriminant = get_discriminant(a, b, c);
+  if (ft_math::flt_equal(discriminant, 0.0f))
+    return {ONE_SOLUTION, {-b / denominator}};
+
+  float discriminant_root = ft_math::sqrt(discriminant);
+  if (discriminant > 0.0f)
+  {
+    float positive = (-b + discriminant_root) / denominator;
+    float negative = (-b - discriminant_root) / denominator;
+
+    return {TWO_SOLUTION, {positive, negative}};
+  }
+  std::strstream solution_msg;
+  float left = -b / denominator;
+
+  solution_msg << left << " + " << discriminant_root << "i/" << 2 * a
+               << std::endl;
+  solution_msg << left << " - " << discriminant_root << "i/" << 2 * a
+               << std::endl;
+  return {solution_msg.str()};
 }
 
 Solution Polynomial::solve(void)
 {
-  Solution solution;
-
   if (_degree > 2)
-  {
-    solution.message = DEGREE_TOO_HIGH;
-    return (solution);
-  }
+    return {DEGREE_TOO_HIGH};
   if (is_multivariable())
-  {
-    solution.message = HAS_MULTIVARIABLE;
-    return (solution);
-  }
+    return {HAS_MULTIVARIABLE};
 
   switch (_degree)
   {
   case 0:
-    solution.solved = _terms.empty();
-    solution.message = solution.solved ? INFINITE_SOLUTIONS : NO_SOLUTIONS;
+    return {_terms.empty() ? INFINITE_SOLUTIONS : NO_SOLUTIONS};
   case 1:
-    solution = _solve_monomial();
+    return (_solve_monomial());
   default:
-    solution = _solve_quadratic();
+    return (_solve_quadratic());
   }
-
-  return (solution);
 }
 
 float Polynomial::get_discriminant(void) const
