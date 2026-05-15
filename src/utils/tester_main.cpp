@@ -148,6 +148,10 @@ int main(int ac, char **argv)
     polynomial.simplify();
     std::cout << "simplified form: " << polynomial << std::endl;
     std::cout << "Polynomial degree: " << polynomial.get_degree() << std::endl;
+    Solution solution = polynomial.solve();
+    std::cout << solution.message << std::endl;
+    for (float result : solution.results)
+      std::cout << result << std::endl;
   }
   catch (std::exception &e)
   {

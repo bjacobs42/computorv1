@@ -9,7 +9,7 @@
 #include <functional>
 #include <iostream>
 #include <iterator>
-#include <strstream>
+#include <sstream>
 #include <vector>
 
 Polynomial::Polynomial(void) {}
@@ -49,7 +49,7 @@ Solution Polynomial::_solve_monomial(void) const
   float b = _get_coefficient_by_degree(0);
 
   if (ft_math::flt_equal(a, 0.0f))
-    return {UNDIFINED};
+    return {UNDEFINED};
   return {SOLUTION_IS, {-b / a}};
 }
 
@@ -60,35 +60,33 @@ Solution Polynomial::_solve_quadratic(void) const
   float c = _get_coefficient_by_degree(0);
 
   if (ft_math::flt_equal(a, 0.0f))
-    return {UNDIFINED};
+    return {UNDEFINED};
 
   float denominator = 2 * a;
   float discriminant = get_discriminant(a, b, c);
   if (ft_math::flt_equal(discriminant, 0.0f))
     return {ONE_SOLUTION, {-b / denominator}};
 
-  float discriminant_root = ft_math::sqrt(discriminant);
   if (discriminant > 0.0f)
   {
-    float positive = (-b + discriminant_root) / denominator;
-    float negative = (-b - discriminant_root) / denominator;
+    float root = ft_math::sqrt(discriminant);
+    float positive = (-b + root) / denominator;
+    float negative = (-b - root) / denominator;
 
-    return {TWO_SOLUTION, {positive, negative}};
+    return {TWO_SOLUTIONS, {positive, negative}};
   }
-  std::strstream solution_msg;
-  float left = -b / denominator;
 
-  solution_msg << left << " + " << discriminant_root << "i/" << 2 * a
-               << std::endl;
-  solution_msg << left << " - " << discriminant_root << "i/" << 2 * a
-               << std::endl;
+  std::stringstream solution_msg;
+  float imaginary = ft_math::sqrt(-discriminant) / ft_math::abs(denominator);
+  float real = -b / denominator;
+
+  solution_msg << real << " + " << imaginary << "i" << std::endl;
+  solution_msg << real << " - " << imaginary << "i" << std::endl;
   return {solution_msg.str()};
 }
 
 Solution Polynomial::solve(void)
 {
-  if (_degree > 2)
-    return {DEGREE_TOO_HIGH};
   if (is_multivariable())
     return {HAS_MULTIVARIABLE};
 
@@ -98,8 +96,10 @@ Solution Polynomial::solve(void)
     return {_terms.empty() ? INFINITE_SOLUTIONS : NO_SOLUTIONS};
   case 1:
     return (_solve_monomial());
-  default:
+  case 2:
     return (_solve_quadratic());
+  default:
+    return {DEGREE_TOO_HIGH};
   }
 }
 

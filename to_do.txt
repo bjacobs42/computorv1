@@ -3,10 +3,12 @@
 - implement Term comparison - done
 - implement Polynomial simplification - done
 - implement Polynomial comparison - improvable
+- implement Polynomial solver - done
 
-- implement Polynomial solver - WIP
-
+- implement ft_math::root
+- handle plus/negative signs
 - complete main function
+- remove slash implementation
 
 -- bonus
 

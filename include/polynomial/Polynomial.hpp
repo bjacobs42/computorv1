@@ -2,7 +2,7 @@
 
 #include "Term.hpp"
 #include "ast/ast.hpp"
-#include "math.hpp"
+#include "utils/math.hpp"
 #include <ostream>
 #include <vector>
 

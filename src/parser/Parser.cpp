@@ -62,6 +62,17 @@ ast::ExprPtr Parser::_parse_number_expr(void)
     float num = std::stof(token.get_value());
     return (ast::new_expr<ast::NumberExpr>(num));
   }
+  case TokenType::PLUS:
+    return (_parse_number_expr());
+  case TokenType::DASH:
+  {
+    ast::ExprPtr new_expr = _parse_number_expr();
+    if (new_expr->kind == ast::ExprKind::number)
+      ((ast::NumberExpr *)new_expr.get())->value *= -1;
+    else
+      ((ast::VariableExpr *)new_expr.get())->sign = -1;
+    return (new_expr);
+  }
   case TokenType::VARIABLE:
     return (ast::new_expr<ast::VariableExpr>(token.get_value()[0]));
   default:

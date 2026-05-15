@@ -34,12 +34,13 @@ namespace ast
   struct VariableExpr : Expr
   {
     VariableExpr(void) { kind = ExprKind::variable; };
-    VariableExpr(char variable_name)
+    VariableExpr(char variable_name, char sign = 1)
+        : name(variable_name), sign(sign)
     {
-      name = variable_name;
       kind = ExprKind::variable;
     };
     char name;
+    char sign;
   };
 
   struct BinaryExpr : Expr
