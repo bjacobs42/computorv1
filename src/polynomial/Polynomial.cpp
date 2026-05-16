@@ -277,14 +277,17 @@ std::vector<Term> Polynomial::_handle_binary(const ast::ExprPtr &expr)
 
 std::vector<Term> Polynomial::_ast_to_terms(const ast::ExprPtr &expr)
 {
-  switch ((int)expr->kind)
+  switch (expr->kind)
   {
-  case (int)ast::ExprKind::binary:
+  case ast::ExprKind::binary:
     return (_handle_binary(expr));
-  case (int)ast::ExprKind::number:
+  case ast::ExprKind::number:
     return {{((ast::NumberExpr *)expr.get())->value}};
-  case (int)ast::ExprKind::variable:
-    return {{1.0f, ((ast::VariableExpr *)expr.get())->name}};
+  case ast::ExprKind::variable:
+  {
+    ast::VariableExpr *var = (ast::VariableExpr *)expr.get();
+    return {{(float)var->sign, var->name}};
+  }
   default:
     throw std::runtime_error("What the hell did you do?");
   }

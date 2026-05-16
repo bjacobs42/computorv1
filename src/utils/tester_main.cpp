@@ -42,15 +42,17 @@ void fill_grid(
     value = ((ast::BinaryExpr *)expression.get())->op.get_value();
     break;
   case (int)ast::ExprKind::number:
-    value =
-        std::to_string((double)((ast::NumberExpr *)expression.get())->value);
+    value = std::to_string(((ast::NumberExpr *)expression.get())->value);
     value.erase(value.find_first_of('0'), std::string::npos);
     if (value.back() == '.')
       value += '0';
     break;
   case (int)ast::ExprKind::variable:
-    value = ((ast::VariableExpr *)expression.get())->name;
+  {
+    ast::VariableExpr *var = (ast::VariableExpr *)expression.get();
+    value = (var->sign > 0 ? "" : "-") + var->name;
     break;
+  }
   default:
     value = "unknown";
   }
