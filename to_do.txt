@@ -13,5 +13,5 @@
 -- bonus
 
 - implement visualization
-- handle free form
-- implement multi-variable polynomial
+- handle free form - done
+- implement multi-variable polynomial -done?
