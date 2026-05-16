@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <stdexcept>
 #define EPSILON 1e-9f
 
@@ -51,7 +52,7 @@ namespace ft_math
     while (abs(prev - guess) > accruacy)
     {
       prev = guess;
-      guess = 0.5f * (guess - base / guess);
+      guess = 0.5f * (guess + base / guess);
     }
 
     return (guess);

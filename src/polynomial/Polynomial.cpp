@@ -10,6 +10,7 @@
 #include <iostream>
 #include <iterator>
 #include <sstream>
+#include <stdexcept>
 #include <vector>
 
 Polynomial::Polynomial(void) {}
@@ -50,7 +51,9 @@ Solution Polynomial::_solve_monomial(void) const
 
   if (ft_math::flt_equal(a, 0.0f))
     return {UNDEFINED};
-  return {SOLUTION_IS, {-b / a}};
+  float x = -b / a;
+  x = ft_math::flt_equal(x, 0.0f) ? 0.0f : x;
+  return {SOLUTION_IS, {x}};
 }
 
 Solution Polynomial::_solve_quadratic(void) const
@@ -250,16 +253,16 @@ std::vector<Term> Polynomial::_handle_binary(const ast::ExprPtr &expr)
 
   std::vector<Term> left = _ast_to_terms(binary->left);
   std::vector<Term> right = _ast_to_terms(binary->right);
-  switch ((int)operator_type)
+  switch (operator_type)
   {
-  case (int)TokenType::PLUS:
+  case TokenType::PLUS:
     left.insert(
         left.end(),
         std::make_move_iterator(right.begin()),
         std::make_move_iterator(right.end())
     );
     break;
-  case (int)TokenType::DASH:
+  case TokenType::DASH:
     for (Term &term : right)
       term *= -1;
     left.insert(
@@ -268,9 +271,11 @@ std::vector<Term> Polynomial::_handle_binary(const ast::ExprPtr &expr)
         std::make_move_iterator(right.end())
     );
     break;
-  case (int)TokenType::STAR:
+  case TokenType::STAR:
     left = _handle_multiply(left, right);
     break;
+  default:
+    throw std::runtime_error("How did you manage to get this far?");
   }
   return (left);
 }
@@ -310,7 +315,7 @@ std::ostream &operator<<(std::ostream &os, const Polynomial &poly)
 
     if (i)
       os << (coefficient >= 0.0f ? " + " : " - ");
-    if (term.is_constant() || ft_math::flt_equal(coefficient, 1.0f))
+    if (term.is_constant() || !ft_math::flt_equal(coefficient, 1.0f))
       os << ft_math::abs(coefficient);
 
     int prev_exponent = 1;

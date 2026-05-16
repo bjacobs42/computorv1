@@ -50,7 +50,8 @@ void fill_grid(
   case (int)ast::ExprKind::variable:
   {
     ast::VariableExpr *var = (ast::VariableExpr *)expression.get();
-    value = (var->sign > 0 ? "" : "-") + var->name;
+    value = (var->sign > 0 ? "" : "-");
+    value += var->name;
     break;
   }
   default:

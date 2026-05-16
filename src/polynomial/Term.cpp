@@ -1,6 +1,7 @@
 #include "polynomial/Term.hpp"
 #include "utils/math.hpp"
 #include <algorithm>
+#include <iostream>
 #include <ostream>
 
 Term::~Term(void) {}
@@ -80,7 +81,6 @@ std::ostream &operator<<(std::ostream &os, const Term &term)
   {
     if (prev_exponent != 1)
       os << " * ";
-    os << "(" << (int)var << ")";
     os << var;
     if (deg != 1)
       os << "^" << deg;
