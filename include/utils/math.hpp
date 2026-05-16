@@ -29,12 +29,9 @@ namespace ft_math
     return (result);
   }
 
-  template <typename Type = double>
-  Type root(const Type &base, unsigned int exponent);
-
-  template <typename Type = double> constexpr Type sqrt(const Type &base)
+  template <typename Type = float>
+  constexpr Type sqrt(const Type &base, float accruacy = 0.00001f)
   {
-    return (root(base, 2));
   }
 
   template <typename Type = float>
