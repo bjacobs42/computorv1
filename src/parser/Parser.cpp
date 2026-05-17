@@ -2,10 +2,12 @@
 #include "ast/ast.hpp"
 #include "lexer/Lexer.hpp"
 #include "lexer/Token.hpp"
+#include "parser/ParserError.hpp"
+#include <exception>
 #include <stdexcept>
 #include <string>
 
-Parser::Parser(const std::string &input)
+Parser::Parser(const std::string &input) : _input(input)
 {
   _init_lookup();
   _tokens = Lexer(input).lex();
@@ -37,14 +39,22 @@ ast::ExprPtr Parser::_parse_expr(BindingPower bp)
 {
   NudFn nud_fn = _lookup[(int)_peek_type()].nud;
   if (!nud_fn)
-    throw std::runtime_error("No nud function found");
+  {
+    throw ParserError(
+        "This is not a primary expression", _input, _peek().get_location()
+    );
+  }
 
   ast::ExprPtr left = (this->*nud_fn)();
   while (_has_tokens() && bp < _lookup[(int)_peek_type()].bp)
   {
     LedFn led_fn = _lookup[(int)_peek_type()].led;
     if (!led_fn)
-      throw std::runtime_error("No led function found");
+    {
+      throw ParserError(
+          "This is not a binary expression", _input, _peek().get_location()
+      );
+    }
 
     left = (this->*led_fn)(std::move(left), _lookup[(int)_peek_type()].bp);
   }
@@ -59,8 +69,21 @@ ast::ExprPtr Parser::_parse_primary_expr(void)
   {
   case TokenType::NUMBER:
   {
-    float num = std::stof(token.get_value());
-    return (ast::new_expr<ast::NumberExpr>(num));
+    try
+    {
+      float num = std::stof(token.get_value());
+      return (ast::new_expr<ast::NumberExpr>(num));
+    }
+    catch (std::out_of_range &)
+    {
+      throw ParserError(
+          "Number overflows float range", _input, token.get_location()
+      );
+    }
+    catch (std::invalid_argument &)
+    {
+      throw ParserError("Malformed number", _input, token.get_location());
+    }
   }
   case TokenType::PLUS:
     return (_parse_primary_expr());
@@ -72,13 +95,13 @@ ast::ExprPtr Parser::_parse_primary_expr(void)
     else if (new_expr->kind == ast::ExprKind::variable)
       ((ast::VariableExpr *)new_expr.get())->sign *= -1;
     else
-      throw std::runtime_error("Invalid minus target");
+      throw ParserError("Invalid minus target", _input, token.get_location());
     return (new_expr);
   }
   case TokenType::VARIABLE:
     return (ast::new_expr<ast::VariableExpr>(token.get_value()[0]));
   default:
-    throw std::runtime_error("Unknown TokenType in parse_primary");
+    throw ParserError("Unknown Token Type", _input, token.get_location());
   }
 }
 
@@ -96,9 +119,7 @@ ast::ExprPtr Parser::_parse_implicit_expr(ast::ExprPtr left, BindingPower bp)
 {
   TokenType ahead_type = _look_ahead();
   if (_peek_type() == TokenType::NUMBER && ahead_type == TokenType::NUMBER)
-  {
-    throw std::runtime_error("Bad implicit expr");
-  }
+    throw ParserError("Bad implicit expr", _input, _peek().get_location());
 
   Token operatorToken = Token(std::string(1, '*'), 0);
   ast::ExprPtr right = _parse_expr(bp);
@@ -124,41 +145,58 @@ void Parser::_register_led(TokenType token_type, BindingPower bp, LedFn led)
   entry->led = led;
 }
 
-// clang-format of
+// clang-format off
 void Parser::_init_lookup(void)
 {
   _register_nud(
-      TokenType::NUMBER, BindingPower::number, &Parser::_parse_primary_expr
+    TokenType::NUMBER,
+    BindingPower::number,
+    &Parser::_parse_primary_expr
   );
   _register_nud(
-      TokenType::VARIABLE, BindingPower::number, &Parser::_parse_primary_expr
+    TokenType::VARIABLE,
+    BindingPower::number,
+    &Parser::_parse_primary_expr
+  );
+  _register_nud(
+    TokenType::PLUS,
+    BindingPower::number,
+    &Parser::_parse_primary_expr
+  );
+  _register_nud(
+    TokenType::DASH,
+    BindingPower::number,
+    &Parser::_parse_primary_expr
   );
 
   _register_led(
-      TokenType::VARIABLE,
-      BindingPower::multiplicative,
-      &Parser::_parse_implicit_expr
+    TokenType::VARIABLE,
+    BindingPower::multiplicative,
+    &Parser::_parse_implicit_expr
   );
   _register_led(
-      TokenType::NUMBER,
-      BindingPower::multiplicative,
-      &Parser::_parse_implicit_expr
+    TokenType::NUMBER,
+    BindingPower::multiplicative,
+    &Parser::_parse_implicit_expr
   );
   _register_led(
-      TokenType::PLUS, BindingPower::additive, &Parser::_parse_binary_expr
+    TokenType::PLUS,
+    BindingPower::additive,
+    &Parser::_parse_binary_expr
   );
   _register_led(
-      TokenType::DASH, BindingPower::additive, &Parser::_parse_binary_expr
+    TokenType::DASH,
+    BindingPower::additive,
+    &Parser::_parse_binary_expr
   );
   _register_led(
-      TokenType::STAR, BindingPower::multiplicative, &Parser::_parse_binary_expr
+    TokenType::STAR,
+    BindingPower::multiplicative,
+    &Parser::_parse_binary_expr
   );
   _register_led(
-      TokenType::SLASH,
-      BindingPower::multiplicative,
-      &Parser::_parse_binary_expr
-  );
-  _register_led(
-      TokenType::CARET, BindingPower::exponential, &Parser::_parse_binary_expr
+    TokenType::CARET,
+    BindingPower::exponential,
+    &Parser::_parse_binary_expr
   );
 }

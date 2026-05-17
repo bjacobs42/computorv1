@@ -134,13 +134,13 @@ int main(int ac, char **argv)
   for (int i = 1; i < ac; ++i)
     input += argv[i];
 
-  std::vector<Token> tokens = Lexer(input).lex();
-  Parser parser(input);
-  print_tokens(tokens);
-
   ast::ExprPtr ast;
   try
   {
+    std::vector<Token> tokens = Lexer(input).lex();
+    Parser parser(input);
+    print_tokens(tokens);
+
     std::cout << "parsing..." << std::endl;
     ast = parser.parse();
     std::cout << "AST Result:" << std::endl;

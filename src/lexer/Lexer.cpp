@@ -1,4 +1,5 @@
 #include "lexer/Lexer.hpp"
+#include "lexer/LexerError.hpp"
 #include "lexer/Token.hpp"
 #include <cctype>
 #include <stdexcept>
@@ -32,9 +33,7 @@ Token Lexer::_handle_number(void)
       break;
     ++_pos;
   }
-  return (
-      Token(_input.substr(start, _pos - start), _pos, TokenType::NUMBER)
-  );
+  return (Token(_input.substr(start, _pos - start), _pos, TokenType::NUMBER));
 }
 
 Token Lexer::_handle_variable(void)
@@ -50,11 +49,13 @@ Token Lexer::_handle_operator(void)
   size_t index = _pos;
   char character = _input[_pos++];
 
-  return (
-      Token(std::string(1, character), index, Token::get_type(character))
-  );
+  return (Token(std::string(1, character), index, Token::get_type(character)));
 }
-Token Lexer::_handle_error(void) { throw std::exception(); }
+
+Token Lexer::_handle_error(void)
+{
+  throw LexerError("Non printable character", _input, _pos);
+}
 
 std::vector<Token> Lexer::lex()
 {

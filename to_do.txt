@@ -6,9 +6,10 @@
 - implement Polynomial solver - done
 - implement ft_math::root - done
 - handle plus/negative signs - done
+- remove slash implementation - done
+- implement error handling - done
 
 - complete main function
-- remove slash implementation
 
 -- bonus
 

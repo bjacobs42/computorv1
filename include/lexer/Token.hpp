@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdexcept>
+#include "lexer/TokenError.hpp"
 #include <string>
 
 enum class TokenType
@@ -10,7 +10,6 @@ enum class TokenType
   PLUS,
   DASH,
   STAR,
-  SLASH,
   CARET,
   END
 };
@@ -23,6 +22,7 @@ public:
   Token(const std::string &value, int pos, TokenType type);
   ~Token(void);
 
+  size_t get_location(void) const { return (_location); }
   const std::string &get_value(void) const { return (_value); }
   TokenType get_type(void) const { return (_type); }
   static TokenType get_type(char character)
@@ -35,14 +35,12 @@ public:
       return (TokenType::DASH);
     case '*':
       return (TokenType::STAR);
-    case '/':
-      return (TokenType::SLASH);
     case '^':
       return (TokenType::CARET);
     case ';':
       return (TokenType::END);
     default:
-      throw std::runtime_error("Token: unknown character");
+      throw TokenError("Unknown character", character);
     }
   }
 

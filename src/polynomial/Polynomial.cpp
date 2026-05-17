@@ -6,11 +6,14 @@
 #include "utils/math.hpp"
 
 #include <algorithm>
+#include <cmath>
 #include <functional>
 #include <iostream>
 #include <iterator>
+#include <limits>
 #include <sstream>
 #include <stdexcept>
+#include <string>
 #include <vector>
 
 Polynomial::Polynomial(void) {}
@@ -83,6 +86,7 @@ Solution Polynomial::_solve_quadratic(void) const
   float imaginary = ft_math::sqrt(-discriminant) / ft_math::abs(denominator);
   float real = -b / denominator;
 
+  solution_msg << COMPLEX_SOLUTION << std::endl;
   solution_msg << real << " + " << imaginary << "i" << std::endl;
   solution_msg << real << " - " << imaginary << "i" << std::endl;
   return {solution_msg.str()};
@@ -111,14 +115,14 @@ float Polynomial::get_discriminant(void) const
   if (_degree != 2)
   {
     throw std::runtime_error(
-        "Can't get the discriminant of a non-quadratic polynomial"
+        "Polynomial: Can't get the discriminant of a non-quadratic polynomial"
     );
   }
 
   if (is_multivariable())
   {
     throw std::runtime_error(
-        "Can't get the discriminant of a multivariable polynomial"
+        "Polynomial: Can't get the discriminant of a multivariable polynomial"
     );
   }
 
@@ -131,9 +135,20 @@ float Polynomial::get_discriminant(void) const
 
 bool Polynomial::is_multivariable(void) const
 {
+  char first_var = 0;
   for (const Term &term : _terms)
   {
     if (term.is_multivariable())
+      return (true);
+
+    const std::map<char, unsigned int> &variables = term.get_variables();
+    if (variables.empty())
+      continue;
+
+    char var_name = variables.begin()->first;
+    if (!first_var)
+      first_var = var_name;
+    else if (first_var != var_name)
       return (true);
   }
   return (false);
@@ -224,22 +239,35 @@ Term Polynomial::_handle_power(const ast::BinaryExpr *binary)
   if (exponent == 0)
     return (Term(1.0f));
 
-  switch ((int)binary->left->kind)
+  switch (binary->left->kind)
   {
-  case (int)ast::ExprKind::number:
+  case ast::ExprKind::number:
   {
     const ast::NumberExpr *num_expr =
         (const ast::NumberExpr *)binary->left.get();
-    return (Term(ft_math::power(num_expr->value, exponent)));
+    float value = ft_math::power(num_expr->value, exponent);
+
+    if (std::isinf(value))
+    {
+      throw std::runtime_error(
+          std::string(
+              "Polynomial: Constant expression overflows: " +
+              std::to_string(num_expr->value) + "^" + std::to_string(exponent)
+          )
+      );
+    }
+    return {value};
   }
-  case (int)ast::ExprKind::variable:
+  case ast::ExprKind::variable:
   {
     const ast::VariableExpr *var_expr =
         (const ast::VariableExpr *)binary->left.get();
     return (Term(1.0f, var_expr->name, exponent));
   }
   default:
-    throw std::runtime_error("Unsupported base in power expression");
+    throw std::runtime_error(
+        "Polynomial: Unsupported ast expression in power expression"
+    );
   }
 }
 
@@ -275,7 +303,7 @@ std::vector<Term> Polynomial::_handle_binary(const ast::ExprPtr &expr)
     left = _handle_multiply(left, right);
     break;
   default:
-    throw std::runtime_error("How did you manage to get this far?");
+    throw std::runtime_error("Polynomial: unimplemented token type");
   }
   return (left);
 }
@@ -294,7 +322,7 @@ std::vector<Term> Polynomial::_ast_to_terms(const ast::ExprPtr &expr)
     return {{(float)var->sign, var->name}};
   }
   default:
-    throw std::runtime_error("What the hell did you do?");
+    throw std::runtime_error("Polynomial: Unknown expresion kind");
   }
 }
 
@@ -315,7 +343,8 @@ std::ostream &operator<<(std::ostream &os, const Polynomial &poly)
 
     if (i)
       os << (coefficient >= 0.0f ? " + " : " - ");
-    if (term.is_constant() || !ft_math::flt_equal(coefficient, 1.0f))
+    if (term.is_constant() ||
+        !ft_math::flt_equal(ft_math::abs(coefficient), 1.0f))
       os << ft_math::abs(coefficient);
 
     int prev_exponent = 1;

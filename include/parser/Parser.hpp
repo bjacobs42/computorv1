@@ -33,6 +33,7 @@ private:
     LedFn led = NULL;
   };
 
+  const std::string &_input;
   std::array<Entry, (int)TokenType::END + 1> _lookup;
   std::vector<Token> _tokens;
   size_t _pos;
