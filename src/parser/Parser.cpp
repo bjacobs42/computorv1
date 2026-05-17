@@ -3,7 +3,6 @@
 #include "lexer/Lexer.hpp"
 #include "lexer/Token.hpp"
 #include "parser/ParserError.hpp"
-#include <exception>
 #include <stdexcept>
 #include <string>
 
@@ -41,7 +40,9 @@ ast::ExprPtr Parser::_parse_expr(BindingPower bp)
   if (!nud_fn)
   {
     throw ParserError(
-        "This is not a primary expression", _input, _peek().get_location()
+        "Expected a primary value like a number",
+        _input,
+        _peek().get_location() + 1
     );
   }
 
@@ -52,7 +53,9 @@ ast::ExprPtr Parser::_parse_expr(BindingPower bp)
     if (!led_fn)
     {
       throw ParserError(
-          "This is not a binary expression", _input, _peek().get_location()
+          "Expected a binary value like a + or *",
+          _input,
+          _peek().get_location() + 1
       );
     }
 

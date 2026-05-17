@@ -10,7 +10,6 @@
 #include <functional>
 #include <iostream>
 #include <iterator>
-#include <limits>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -221,6 +220,13 @@ float Polynomial::_get_coefficient_by_degree(unsigned int exponent) const
 
 unsigned int Polynomial::_eval_constant_power(const ast::ExprPtr &expr)
 {
+  if (expr->kind == ast::ExprKind::variable)
+  {
+    throw std::runtime_error(
+        "Polynomial: We do not accept variable power like x^x >:C; "
+    );
+  }
+
   if (expr->kind == ast::ExprKind::number)
   {
     const ast::NumberExpr *num_expr = (const ast::NumberExpr *)expr.get();
