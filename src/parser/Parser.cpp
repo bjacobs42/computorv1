@@ -17,6 +17,8 @@ Parser::~Parser() {}
 
 ast::ExprPtr Parser::parse(void)
 {
+  if (_tokens.empty())
+    return (NULL);
   return (_parse_expr(BindingPower::default_bp));
 }
 

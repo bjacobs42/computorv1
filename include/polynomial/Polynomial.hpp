@@ -22,14 +22,19 @@ class Polynomial
 {
 public:
   Polynomial(void);
-  Polynomial(const std::vector<Term> &terms);
-  Polynomial(const ast::ExprPtr &expr);
+  Polynomial(const std::string &input);
+  Polynomial(const std::vector<Term> &terms) : _terms(terms) { _set_degree(); }
+  Polynomial(const ast::ExprPtr &expr) : _terms(_ast_to_terms(expr))
+  {
+    _set_degree();
+  }
   ~Polynomial(void);
 
   void simplify(void);
   Solution solve(void);
 
   bool is_multivariable(void) const;
+  bool empty(void) const { return (_terms.empty()); }
 
   float get_discriminant(void) const;
   float get_discriminant(float a, float b, float c) const

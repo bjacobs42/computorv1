@@ -1,6 +1,7 @@
 #include "polynomial/Polynomial.hpp"
 #include "ast/ast.hpp"
 #include "lexer/Token.hpp"
+#include "parser/Parser.hpp"
 #include "polynomial/PolynomialMessages.hpp"
 #include "polynomial/Term.hpp"
 #include "utils/math.hpp"
@@ -18,13 +19,12 @@
 Polynomial::Polynomial(void) {}
 Polynomial::~Polynomial(void) {}
 
-Polynomial::Polynomial(const std::vector<Term> &terms) : _terms(terms)
+Polynomial::Polynomial(const std::string &input)
 {
-  _set_degree();
-}
+  Parser parser(input);
 
-Polynomial::Polynomial(const ast::ExprPtr &expr) : _terms(_ast_to_terms(expr))
-{
+  ast::ExprPtr expressions = parser.parse();
+  _terms = _ast_to_terms(expressions);
   _set_degree();
 }
 
@@ -178,6 +178,8 @@ Polynomial Polynomial::operator-(const Polynomial &right)
 
 void Polynomial::_set_degree(void)
 {
+  _degree = 0;
+
   for (const Term &term : _terms)
     _degree = std::max(_degree, term.get_max_exponent());
 }
@@ -316,6 +318,9 @@ std::vector<Term> Polynomial::_handle_binary(const ast::ExprPtr &expr)
 
 std::vector<Term> Polynomial::_ast_to_terms(const ast::ExprPtr &expr)
 {
+  if (!expr)
+    return {};
+
   switch (expr->kind)
   {
   case ast::ExprKind::binary:
@@ -364,5 +369,6 @@ std::ostream &operator<<(std::ostream &os, const Polynomial &poly)
       prev_exponent = exp;
     }
   }
+  os << " = 0";
   return (os);
 }

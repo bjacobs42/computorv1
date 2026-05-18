@@ -5,17 +5,19 @@ INCLUDE	:= -I ./include
 CC			:= c++
 
 ifdef DEBUG
-CFLAGS	:= -g -fsanitize=address
+CFLAGS		:= -g -fsanitize=address
+SRC_FILES  = main.cpp
 else
-CFLAGS	:= -Wall -Werror -Wextra
+CFLAGS		:= -Wall -Werror -Wextra
+SRC_FILES  = main.cpp
 endif
 
-SRC_FILES	:= utils/tester_main.cpp \
-						 lexer/Token.cpp \
-						 lexer/Lexer.cpp \
-						 parser/Parser.cpp \
-						 polynomial/Polynomial.cpp \
-						 polynomial/Term.cpp \
+SRC_FILES	+= lexer/Token.cpp						\
+						 lexer/Lexer.cpp						\
+						 parser/Parser.cpp					\
+						 polynomial/Polynomial.cpp	\
+						 polynomial/Term.cpp				\
+						 utils/utils.cpp
 
 OBJS		:= $(addprefix $(OBJ_FR), $(SRC_FILES:.cpp=.o))
 
