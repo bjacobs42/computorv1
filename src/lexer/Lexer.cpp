@@ -46,8 +46,11 @@ Token Lexer::_handle_operator(void)
 {
   size_t index = _pos;
   char character = _input[_pos++];
+  TokenType type = Token::get_type(character);
 
-  return (Token(std::string(1, character), index, Token::get_type(character)));
+  if ((int)type < 0)
+    throw LexerError("Unknown character", _input, _pos);
+  return (Token(std::string(1, character), index, type));
 }
 
 Token Lexer::_handle_error(void)

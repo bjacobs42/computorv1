@@ -1,6 +1,5 @@
 #pragma once
 
-#include "lexer/TokenError.hpp"
 #include <string>
 
 enum class TokenType
@@ -40,7 +39,7 @@ public:
     case ';':
       return (TokenType::END);
     default:
-      throw TokenError("Unknown character", character);
+      return ((TokenType)-1);
     }
   }
 

@@ -44,6 +44,7 @@ void Polynomial::simplify(void)
     _terms.emplace_back(coeff, vars);
   }
   std::sort(_terms.begin(), _terms.end(), std::greater<Term>());
+  _set_degree();
 }
 
 Solution Polynomial::_solve_monomial(void) const
@@ -342,10 +343,7 @@ std::ostream &operator<<(std::ostream &os, const Polynomial &poly)
   int term_count = poly._terms.size();
 
   if (term_count == 0)
-  {
     os << '0';
-    return (os);
-  }
 
   for (int i = 0; i < term_count; ++i)
   {

@@ -8,8 +8,7 @@
 - handle plus/negative signs - done
 - remove slash implementation - done
 - implement error handling - done
-
-- complete main function
+- complete main function - done
 
 -- bonus
 
